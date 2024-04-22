@@ -1,4 +1,4 @@
-package com.movtery.util;
+package com.movtery.quick_chat.util;
 
 public class LastMessage {
     private static final LastMessage LAST_MESSAGE = new LastMessage();
@@ -20,11 +20,11 @@ public class LastMessage {
         this.lastTime = lastTime;
     }
 
-    public void setLastMessage(String lastMessage) {
-        this.lastMessage = lastMessage;
-    }
-
     public String getLastMessage() {
         return lastMessage;
+    }
+
+    public void setLastMessage(String lastMessage) {
+        this.lastMessage = lastMessage;
     }
 }

@@ -1,87 +1,105 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
-	id 'maven-publish'
+    id 'java-library'
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.neoforged.gradle.userdev' version '7.0.97'
 }
 
-version = project.mod_version
-group = project.maven_group
-
-base {
-	archivesName = project.archives_base_name
-}
+version = mod_version
+group = mod_group_id
 
 repositories {
-	mavenCentral()
+    mavenLocal()
 
-	maven { url "https://maven.terraformersmc.com/releases/" } // Mod Menu
-	maven { url "https://maven.isxander.dev/releases" } // YACL
+    maven {
+        name 'Xander Maven'
+        url 'https://maven.isxander.dev/releases'
+    }
 }
 
-loom {
-    splitEnvironmentSourceSets()
-
-	mods {
-		"modid" {
-			sourceSet sourceSets.main
-			sourceSet sourceSets.client
-		}
-	}
-
+base {
+    archivesName = mod_id
 }
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+runs {
+    configureEach {
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
+
+        systemProperty 'forge.logging.console.level', 'debug'
+
+        modSource project.sourceSets.main
+    }
+
+    client {
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    server {
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+        programArgument '--nogui'
+    }
+
+    gameTestServer {
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    data {
+        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modImplementation "com.terraformersmc:modmenu:$project.modmenu"
-	modImplementation "dev.isxander.yacl:yet-another-config-lib-fabric:$project.yacl"
+    implementation "net.neoforged:neoforge:${neo_version}"
+    implementation("dev.isxander.yacl:yet-another-config-lib-${yacl_loader}:${yacl}") //YACL
 }
 
-processResources {
-	inputs.property "version", project.version
+tasks.withType(ProcessResources).configureEach {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description
+    ]
+    inputs.properties replaceProperties
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
+    filesMatching(['META-INF/mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "file://${project.projectDir}/repo"
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
+    options.encoding = 'UTF-8'
 }
 
-java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
-
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
-}
-
-jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
 }

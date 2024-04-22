@@ -1,8 +1,8 @@
-package com.movtery.config;
+package com.movtery.quick_chat.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.movtery.QuickChatClient;
+import com.movtery.quick_chat.QuickChat;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class Config {
             try {
                 options = GSON.fromJson(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8), Options.class);
             } catch (IOException e) {
-                QuickChatClient.LOGGER.error("Error loading config");
+                QuickChat.LOGGER.error("Error loading config");
             }
 
         }
@@ -44,7 +44,7 @@ public class Config {
         try {
             Files.write(file.toPath(), Collections.singleton(GSON.toJson(options)), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            QuickChatClient.LOGGER.error("Error saving config");
+            QuickChat.LOGGER.error("Error saving config");
         }
     }
 
