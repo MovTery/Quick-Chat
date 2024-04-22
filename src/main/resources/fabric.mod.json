@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "quick_chat",
+	"version": "${version}",
+	"name": "Quick Chat",
+	"description": "Send messages quickly by pressing keys.",
+	"authors": [
+		"MovTery"
+	],
+	"contact": {
+	},
+	"license": "MIT",
+	"icon": "assets/quick_chat/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.movtery.ChatTranslation"
+		],
+		"client": [
+			"com.movtery.QuickChatClient"
+		],
+		"modmenu": [
+			"com.movtery.integration.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+		"quick_chat.mixins.json",
+		{
+			"config": "quick_chat.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"minecraft": "~1.20.4",
+		"fabric-api": "*"
+	}
+}
