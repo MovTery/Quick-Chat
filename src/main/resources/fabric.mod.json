@@ -14,7 +14,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.movtery.ChatTranslation"
+			"com.movtery.QuickChat"
 		],
 		"client": [
 			"com.movtery.QuickChatClient"
