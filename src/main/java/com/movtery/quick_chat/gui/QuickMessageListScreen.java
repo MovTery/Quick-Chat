@@ -126,7 +126,7 @@ public class QuickMessageListScreen extends Screen {
 
     private class MessageListWidget extends ObjectSelectionList<MessageListWidget.MessageListEntry> {
         public MessageListWidget(Minecraft client) {
-            super(client, QuickMessageListScreen.this.width, QuickMessageListScreen.this.height - 93, 32, 18);
+            super(client, QuickMessageListScreen.this.width, QuickMessageListScreen.this.height, 32, QuickMessageListScreen.this.height - 65 + 4, 18);
             TreeSet<String> message = config.getOptions().message;
             if (!message.isEmpty()) {
                 AtomicInteger i = new AtomicInteger();
@@ -157,7 +157,7 @@ public class QuickMessageListScreen extends Screen {
             return Math.min(width, this.width);
         }
 
-        public class MessageListEntry extends ObjectSelectionList.Entry<MessageListEntry> {
+        public class MessageListEntry extends Entry<MessageListEntry> {
             final String message;
             private long clickTime;
 
