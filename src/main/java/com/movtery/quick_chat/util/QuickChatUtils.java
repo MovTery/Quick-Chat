@@ -74,7 +74,7 @@ public class QuickChatUtils {
         } else {
             BigDecimal bigDecimal = BigDecimal.valueOf(duration);
             BigDecimal t = bigDecimal.subtract(BigDecimal.valueOf(differ / 1000.0));
-            player.displayClientMessage(Component.translatable("quick_chat.chat.too_often").append(String.format(" %.2fs", t)), true);
+            player.displayClientMessage(Component.translatable("quick_chat.in_game.too_often").append(String.format(" %.2fs", t)), true);
         }
     }
 }

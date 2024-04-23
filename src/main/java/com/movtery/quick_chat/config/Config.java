@@ -50,6 +50,7 @@ public class Config {
 
     public static class Options {
         public String messageValue = "Hello!";
+        public boolean antiFalseContact = false;
         public boolean messageCoolingDown = true;
         public double messageCoolingDuration = 10.0;
 

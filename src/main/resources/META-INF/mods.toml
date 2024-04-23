@@ -9,6 +9,8 @@ displayName="${mod_name}"
 authors="${mod_authors}"
 description='''${mod_description}'''
 
+logoFile="quick_chat.x128.png"
+
 [[dependencies.${mod_id}]]
     modId="neoforge"
     mandatory=true

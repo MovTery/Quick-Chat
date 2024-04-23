@@ -3,6 +3,7 @@ package com.movtery.quick_chat.util;
 public class LastMessage {
     private static final LastMessage LAST_MESSAGE = new LastMessage();
     private long lastTime = 0;
+    private long lastClick = 0;
     private String lastMessage = "Hello!";
 
     private LastMessage() {
@@ -19,12 +20,19 @@ public class LastMessage {
     public void setLastTime(long lastTime) {
         this.lastTime = lastTime;
     }
+    public long getLastClick() {
+        return lastClick;
+    }
 
-    public String getLastMessage() {
-        return lastMessage;
+    public void setLastClick(long lastClick) {
+        this.lastClick = lastClick;
     }
 
     public void setLastMessage(String lastMessage) {
         this.lastMessage = lastMessage;
+    }
+
+    public String getLastMessage() {
+        return lastMessage;
     }
 }
