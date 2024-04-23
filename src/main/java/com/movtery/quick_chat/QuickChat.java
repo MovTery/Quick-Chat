@@ -2,8 +2,10 @@ package com.movtery.quick_chat;
 
 import com.movtery.quick_chat.config.RegisterModsPage;
 import com.movtery.quick_chat.gui.QuickMessageListScreen;
+import com.movtery.quick_chat.util.LastMessage;
 import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -27,6 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+
+import static com.movtery.quick_chat.util.QuickChatUtils.getConfig;
 
 @Mod(QuickChat.MODID)
 public class QuickChat {
@@ -61,6 +65,16 @@ public class QuickChat {
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             while (ONE_CLICK.get().consumeClick()) {
+                //开启防误触设置之后，将启用双击检测
+                if (getConfig().getOptions().antiFalseContact) {
+                    LastMessage instance = LastMessage.getInstance();
+                    long clickTime = Util.getMillis();
+                    //点击即进行判断，如果前后两次点击时间相差不超过0.25秒，那么表示这是一次双击
+                    boolean isDoubleClick = clickTime - instance.getLastClick() < 250L;
+                    instance.setLastClick(clickTime);
+
+                    if (!isDoubleClick) break;
+                }
                 LocalPlayer player = Minecraft.getInstance().player;
                 Objects.requireNonNull(player);
 
@@ -78,7 +92,7 @@ public class QuickChat {
         event.getDispatcher().register(Commands.literal("quickchat")
                 .then(Commands.literal("reload")
                         .executes(context -> {
-                            QuickChatUtils.getConfig();
+                            getConfig();
                             context.getSource().sendSystemMessage(Component.literal("[").append(MODNAME).append("] ").append(Component.translatable("quick_chat.config.reloaded")).withStyle(ChatFormatting.YELLOW));
                             return 1;
                         })));
@@ -88,7 +102,7 @@ public class QuickChat {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            QuickChatUtils.getConfig();
+            getConfig();
         }
 
         @SubscribeEvent
