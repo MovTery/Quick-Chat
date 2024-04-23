@@ -12,6 +12,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -51,6 +52,16 @@ public class QuickChatUtils {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (oneClick.wasPressed()) {
+                //开启防误触设置之后，将启用双击检测
+                if (getConfig().getOptions().antiFalseContact) {
+                    LastMessage instance = LastMessage.getInstance();
+                    long clickTime = Util.getMeasuringTimeMs();
+                    //点击即进行判断，如果前后两次点击时间相差不超过0.25秒，那么表示这是一次双击
+                    boolean isDoubleClick = clickTime - instance.getLastClick() < 250L;
+                    instance.setLastClick(clickTime);
+
+                    if (!isDoubleClick) break;
+                }
                 ClientPlayerEntity player = MinecraftClient.getInstance().player;
                 if (Objects.isNull(player)) break;
 
@@ -119,7 +130,7 @@ public class QuickChatUtils {
         } else {
             BigDecimal bigDecimal = BigDecimal.valueOf(duration);
             BigDecimal t = bigDecimal.subtract(BigDecimal.valueOf(differ / 1000.0));
-            player.sendMessage(Text.translatable("quick_chat.chat.too_often").append(String.format(" %.2fs", t)), true);
+            player.sendMessage(Text.translatable("quick_chat.in_game.too_often").append(String.format(" %.2fs", t)), true);
         }
     }
 }

@@ -30,6 +30,16 @@ public class YACLConfig {
                                 })
                                 .controller(StringControllerBuilder::create)
                                 .build())
+                        //防误触
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.translatable("quick_chat.config.anti_false_contact"))
+                                .description(OptionDescription.of(Text.translatable("quick_chat.config.anti_false_contact.desc")))
+                                .binding(defaultVal.antiFalseContact, () -> options.antiFalseContact, newVal -> {
+                                    options.antiFalseContact = newVal;
+                                    getConfig().save();
+                                })
+                                .controller(BooleanControllerBuilder::create)
+                                .build())
                         //快捷消息列表
                         .option(ButtonOption.createBuilder()
                                 .name(Text.translatable("quick_chat.gui.message_list.title"))

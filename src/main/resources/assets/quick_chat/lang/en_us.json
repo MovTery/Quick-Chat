@@ -1,24 +1,29 @@
 {
   "quick_chat.name": "Quick Chat",
 
-  "quick_chat.keybinding.one_click": "Send with One Click",
+  "modmenu.nameTranslation.quick_chat": "Quick Chat",
+  "modmenu.descriptionTranslation.quick_chat": "Send messages quickly by pressing keys.",
+
+  "quick_chat.keybinding.one_click": "One-click Send",
   "quick_chat.keybinding.quick_message": "Open Quick Message List Screen",
 
-  "quick_chat.chat.too_often": "Message sent too often!",
+  "quick_chat.in_game.too_often": "Message sent too often!",
 
   "quick_chat.config.reloaded": "Config file reloaded!",
   "quick_chat.config.open": "Open",
-  "quick_chat.config.message": "Message content",
-  "quick_chat.config.message.desc": "Set the content of quick messages to send\n\nStart with \"/\" to execute as command",
+  "quick_chat.config.message": "Message Content",
+  "quick_chat.config.message.desc": "Set the content to be sent as quick messages\n\nStart with \"/\" for Mod command execution",
+  "quick_chat.config.anti_false_contact": "Anti False Contact",
+  "quick_chat.config.anti_false_contact.desc": "When enabled, you need to double-click the hotkey to send the message, avoiding accidental triggers",
   "quick_chat.config.message_list": "Open Quick Message List",
-  "quick_chat.config.message_list.desc": "You can add more quick messages here, and quickly open this screen in-game to send what you want!",
+  "quick_chat.config.message_list.desc": "You can add more quick messages in this screen. After entering the game, you can quickly open this screen by pressing the key binding, then send the content you want!",
   "quick_chat.config.cooldown": "Send Cooldown",
-  "quick_chat.config.cooldown.desc": "If disabled, cooldown duration will be set to 0.5s",
+  "quick_chat.config.cooldown.desc": "If turned off, cooldown duration will be set to 0.5s",
   "quick_chat.config.cooldown_duration": "Cooldown Duration",
   "quick_chat.config.cooldown_duration.desc": "Set the interval for sending messages",
 
   "quick_chat.gui.message_list.title": "Quick Message List",
-  "quick_chat.gui.message_list.tip_empty": "No messages available, please add new ones!",
+  "quick_chat.gui.message_list.tip_empty": "No messages available, please add new messages!",
   "quick_chat.gui.message_list.tip": "Select a message, you can delete, edit, or send it!",
   "quick_chat.gui.message_list.add": "Add",
   "quick_chat.gui.message_list.edit": "Edit",
