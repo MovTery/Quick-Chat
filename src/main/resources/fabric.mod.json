@@ -8,6 +8,8 @@
 		"MovTery"
 	],
 	"contact": {
+		"homepage": "https://modrinth.com/mod/quick-chat",
+		"sources": "https://github.com/HopiHopy/Quick-Chat"
 	},
 	"license": "MIT",
 	"icon": "assets/quick_chat/icon.png",
