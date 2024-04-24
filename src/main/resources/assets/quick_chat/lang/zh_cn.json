@@ -10,8 +10,8 @@
   "quick_chat.in_game.too_often": "消息发送过于频繁！",
 
   "quick_chat.config.reloaded": "配置文件已重载!",
-  "quick_chat.config.open": "打开",
   "quick_chat.config.message": "消息内容",
+  "quick_chat.config.message.empty": "（该内容不能为空！）",
   "quick_chat.config.message.desc": "设置快捷消息发送的内容\n\n在内容开头处加上 \"/\" 符号，Mod 会将其作为命令执行",
   "quick_chat.config.anti_false_contact": "防误触",
   "quick_chat.config.anti_false_contact.desc": "开启后，你需要双击快捷键后才能快捷发送消息，避免误触",
