@@ -8,8 +8,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 
-import java.util.Objects;
-
 import static com.movtery.util.QuickChatUtils.getConfig;
 import static net.minecraft.screen.ScreenTexts.CANCEL;
 
@@ -45,7 +43,7 @@ public class AddMessageScreen extends Screen {
 
     @Override
     public void close() {
-        Objects.requireNonNull(this.client);
+        if (this.client == null) return;
         this.client.setScreen(this.parent);
     }
 

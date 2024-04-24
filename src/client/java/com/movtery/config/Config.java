@@ -52,7 +52,7 @@ public class Config {
         public String messageValue = "Hello!";
         public boolean antiFalseContact = false;
         public boolean messageCoolingDown = true;
-        public double messageCoolingDuration = 10.0;
+        public int messageCoolingDuration = 10;
 
         public TreeSet<String> message = new TreeSet<>();
     }

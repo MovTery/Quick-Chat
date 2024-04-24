@@ -98,7 +98,6 @@ public class QuickChatUtils {
     }
 
     public static void sendMessage(@NotNull ClientPlayerEntity player) {
-        Objects.requireNonNull(player);
         Config.Options options = getConfig().getOptions();
 
         String message = options.messageValue;

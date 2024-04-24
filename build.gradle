@@ -14,7 +14,6 @@ repositories {
 	mavenCentral()
 
 	maven { url "https://maven.terraformersmc.com/releases/" } // Mod Menu
-	maven { url "https://maven.isxander.dev/releases" } // YACL
 }
 
 loom {
@@ -38,7 +37,6 @@ dependencies {
 	// Fabric API.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "com.terraformersmc:modmenu:$project.modmenu"
-	modImplementation "dev.isxander.yacl:yet-another-config-lib-fabric:$project.yacl"
 }
 
 processResources {

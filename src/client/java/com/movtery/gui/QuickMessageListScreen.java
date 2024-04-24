@@ -61,7 +61,7 @@ public class QuickMessageListScreen extends Screen {
 
     @Override
     public void close() {
-        Objects.requireNonNull(this.client);
+        if (this.client == null) return;
         this.client.setScreen(parent);
     }
 
@@ -114,12 +114,12 @@ public class QuickMessageListScreen extends Screen {
     }
 
     private void addMessage() {
-        Objects.requireNonNull(this.client);
+        if (this.client == null) return;
         this.client.setScreen(new AddMessageScreen(this));
     }
 
     private void edit() {
-        Objects.requireNonNull(this.client);
+        if (this.client == null) return;
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelectedOrNull();
         if (messageListEntry != null) {
             this.client.setScreen(new AddMessageScreen(this, messageListEntry.message));
@@ -150,13 +150,9 @@ public class QuickMessageListScreen extends Screen {
         public int getRowWidth() {
             MessageListWidget.MessageListEntry messageListEntry = QuickMessageListScreen.this.messageListWidget.getSelectedOrNull();
             if (messageListEntry == null) return super.getRowWidth();
-            int length = messageListEntry.message.length();
-            int width = 25;
-            if (length >= width) {
-                width = messageListEntry.message.length();
-            }
-            width = width * 6 + 80;
-            return Math.min(width, this.width);
+
+            //根据显示的文本的实际宽度来设置选择框宽度
+            return Math.min(QuickMessageListScreen.this.textRenderer.getWidth(messageListEntry.message) + 200, this.width);
         }
 
         @Environment(EnvType.CLIENT)
