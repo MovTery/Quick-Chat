@@ -8,6 +8,8 @@
 		"MovTery"
 	],
 	"contact": {
+		"homepage": "https://modrinth.com/mod/quick-chat",
+		"sources": "https://github.com/HopiHopy/Quick-Chat"
 	},
 	"license": "MIT",
 	"icon": "assets/quick_chat/icon.png",
@@ -23,15 +25,9 @@
 			"com.movtery.integration.ModMenuIntegration"
 		]
 	},
-	"mixins": [
-		"quick_chat.mixins.json",
-		{
-			"config": "quick_chat.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
-		"minecraft": "~1.20.4",
+		"minecraft": "1.20.5",
+		"java": ">=21",
 		"fabric-api": "*"
 	}
 }
