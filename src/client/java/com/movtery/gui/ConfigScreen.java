@@ -56,6 +56,8 @@ public class ConfigScreen extends Screen {
         this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
                 .dimensions(this.width / 2 - 95, this.height / 2 + 40, 190, 20)
                 .build());
+
+        cooldownDurationButton.active = options.messageCoolingDown;
     }
 
     @Override
