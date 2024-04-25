@@ -59,7 +59,7 @@ public class QuickMessageListScreen extends Screen {
 
     @Override
     public void onClose() {
-        Objects.requireNonNull(this.minecraft);
+        if (this.minecraft == null) return;
         this.minecraft.setScreen(parent);
     }
 
@@ -112,12 +112,12 @@ public class QuickMessageListScreen extends Screen {
     }
 
     private void addMessage() {
-        Objects.requireNonNull(this.minecraft);
+        if (this.minecraft == null) return;
         this.minecraft.setScreen(new AddMessageScreen(this));
     }
 
     private void edit() {
-        Objects.requireNonNull(this.minecraft);
+        if (this.minecraft == null) return;
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelected();
         if (messageListEntry != null) {
             this.minecraft.setScreen(new AddMessageScreen(this, messageListEntry.message));
@@ -148,13 +148,9 @@ public class QuickMessageListScreen extends Screen {
         public int getRowWidth() {
             MessageListEntry messageListEntry = QuickMessageListScreen.this.messageListWidget.getSelected();
             if (messageListEntry == null) return super.getRowWidth();
-            int length = messageListEntry.message.length();
-            int width = 25;
-            if (length >= width) {
-                width = messageListEntry.message.length();
-            }
-            width = width * 6 + 80;
-            return Math.min(width, this.width);
+
+            //根据显示的文本的实际宽度来设置选择框宽度
+            return Math.min((int) QuickMessageListScreen.this.font.getSplitter().stringWidth(messageListEntry.message) + 200, this.width);
         }
 
         public class MessageListEntry extends ObjectSelectionList.Entry<MessageListEntry> {
