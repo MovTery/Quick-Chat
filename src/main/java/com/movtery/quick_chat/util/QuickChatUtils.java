@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.Date;
-import java.util.Objects;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
 import static com.movtery.quick_chat.QuickChat.MODID;
@@ -42,7 +41,6 @@ public class QuickChatUtils {
     }
 
     public static void sendMessage(@NotNull LocalPlayer player) {
-        Objects.requireNonNull(player);
         Config.Options options = getConfig().getOptions();
 
         String message = options.messageValue;

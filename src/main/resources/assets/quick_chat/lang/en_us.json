@@ -7,8 +7,8 @@
   "quick_chat.in_game.too_often": "Message sent too often!",
 
   "quick_chat.config.reloaded": "Config file reloaded!",
-  "quick_chat.config.open": "Open",
   "quick_chat.config.message": "Message Content",
+  "quick_chat.config.message.empty": "(This content cannot be empty!)",
   "quick_chat.config.message.desc": "Set the content to be sent as quick messages\n\nStart with \"/\" for Mod command execution",
   "quick_chat.config.anti_false_contact": "Anti False Contact",
   "quick_chat.config.anti_false_contact.desc": "When enabled, you need to double-click the hotkey to send the message, avoiding accidental triggers",
@@ -28,5 +28,7 @@
   "quick_chat.gui.message_list.send": "Send",
   "quick_chat.gui.message_list.send_not_in_game": "Please enter the game before using this feature!",
   "quick_chat.gui.add_message.title": "Edit Quick Message",
-  "quick_chat.gui.add_message.add": "Confirm"
+  "quick_chat.gui.add_message.add": "Confirm",
+
+  "quick_chat.options.second_value": "%s: %ss"
 }

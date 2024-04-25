@@ -10,8 +10,6 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 import static com.movtery.quick_chat.util.QuickChatUtils.getConfig;
 
 public class AddMessageScreen extends Screen {
@@ -46,7 +44,7 @@ public class AddMessageScreen extends Screen {
 
     @Override
     public void onClose() {
-        Objects.requireNonNull(this.minecraft);
+        if (this.minecraft == null) return;
         this.minecraft.setScreen(this.parent);
     }
 
