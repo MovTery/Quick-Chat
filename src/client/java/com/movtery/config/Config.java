@@ -12,7 +12,8 @@ import java.util.Collections;
 import java.util.TreeSet;
 
 public class Config {
-    public static final double[] messageCoolingDurationRange = {1.0, 15.0};
+    public static final int[] messageCoolingDurationRange = {1, 15};
+    public static final int[] chatQuickMessageButtonWidthRange = {60, 200};
     private final File file;
     private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private Options options = null;
