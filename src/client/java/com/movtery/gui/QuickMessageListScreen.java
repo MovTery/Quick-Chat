@@ -16,12 +16,13 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.movtery.util.QuickChatUtils.getConfig;
-import static com.movtery.util.QuickChatUtils.sendMessage;
+import static com.movtery.util.QuickChatUtils.*;
 
 @Environment(EnvType.CLIENT)
 public class QuickMessageListScreen extends Screen {
@@ -92,7 +93,7 @@ public class QuickMessageListScreen extends Screen {
         if (this.client == null) close();
 
         if (messageListEntry != null && this.client.player != null) {
-            sendMessage(this.client.player, messageListEntry.message);
+            sendMessage(this.client.player, messageListEntry.message.get(messageListEntry.key));
         }
 
         this.close();
@@ -103,7 +104,7 @@ public class QuickMessageListScreen extends Screen {
         if (messageListEntry != null) {
             TreeSet<String> message = config.getOptions().message;
             if (!message.isEmpty()) {
-                message.remove(messageListEntry.message);
+                message.remove(messageListEntry.message.get(messageListEntry.key));
             }
             config.save();
         }
@@ -122,7 +123,7 @@ public class QuickMessageListScreen extends Screen {
         if (this.client == null) return;
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelectedOrNull();
         if (messageListEntry != null) {
-            this.client.setScreen(new AddMessageScreen(this, messageListEntry.message));
+            this.client.setScreen(new AddMessageScreen(this, messageListEntry.message.get(messageListEntry.key)));
         }
     }
 
@@ -136,7 +137,8 @@ public class QuickMessageListScreen extends Screen {
                 message.forEach(s -> {
                     MessageListEntry entry = new MessageListEntry(s);
                     this.addEntry(entry);
-                    if (i.get() == 0 || Objects.equals(s, LastMessage.getInstance().getLastMessage())) this.setSelected(entry);
+                    if (i.get() == 0 || Objects.equals(s, LastMessage.getInstance().getLastMessage()))
+                        this.setSelected(entry);
                     i.getAndIncrement();
                 });
             } else {
@@ -148,24 +150,22 @@ public class QuickMessageListScreen extends Screen {
 
         @Override
         public int getRowWidth() {
-            MessageListWidget.MessageListEntry messageListEntry = QuickMessageListScreen.this.messageListWidget.getSelectedOrNull();
-            if (messageListEntry == null) return super.getRowWidth();
-
-            //根据显示的文本的实际宽度来设置选择框宽度
-            return Math.min(QuickMessageListScreen.this.textRenderer.getWidth(messageListEntry.message) + 200, this.width);
+            return this.width / 2 + 8;
         }
 
         @Environment(EnvType.CLIENT)
         public class MessageListEntry extends AlwaysSelectedEntryListWidget.Entry<MessageListWidget.MessageListEntry> {
-            final String message;
+            final Map<String, String> message = new HashMap<>();
+            final String key;
             private long clickTime;
 
             public MessageListEntry(String message) {
-                this.message = message;
+                this.key = getAbbreviatedText(message, client, QuickMessageListScreen.this.width / 2 - 8);
+                this.message.put(this.key, message);
             }
 
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                context.drawCenteredTextWithShadow(client.textRenderer, this.message, MessageListWidget.this.width / 2, y + 1, 16777215);
+                context.drawCenteredTextWithShadow(client.textRenderer, this.key, MessageListWidget.this.width / 2, y + 1, 16777215);
             }
 
             public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -183,7 +183,7 @@ public class QuickMessageListScreen extends Screen {
             }
 
             public Text getNarration() {
-                return Text.literal(this.message);
+                return Text.literal(this.message.get(key));
             }
         }
     }

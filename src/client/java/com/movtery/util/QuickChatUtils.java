@@ -54,13 +54,7 @@ public class QuickChatUtils {
             while (oneClick.wasPressed()) {
                 //开启防误触设置之后，将启用双击检测
                 if (getConfig().getOptions().antiFalseContact) {
-                    LastMessage instance = LastMessage.getInstance();
-                    long clickTime = Util.getMeasuringTimeMs();
-                    //点击即进行判断，如果前后两次点击时间相差不超过0.25秒，那么表示这是一次双击
-                    boolean isDoubleClick = clickTime - instance.getLastClick() < 250L;
-                    instance.setLastClick(clickTime);
-
-                    if (!isDoubleClick) break;
+                    if (isDoubleClick()) break;
                 }
                 ClientPlayerEntity player = MinecraftClient.getInstance().player;
                 if (Objects.isNull(player)) break;
@@ -95,6 +89,22 @@ public class QuickChatUtils {
         }
         config = new Config(configFile);
         config.load();
+    }
+
+    public static boolean isDoubleClick() {
+        LastMessage instance = LastMessage.getInstance();
+        long clickTime = Util.getMeasuringTimeMs();
+        //点击即进行判断，如果前后两次点击时间相差不超过0.25秒，那么表示这是一次双击
+        boolean isDoubleClick = clickTime - instance.getLastClick() < 250L;
+        instance.setLastClick(clickTime);
+
+        return !isDoubleClick;
+    }
+
+    public static String getAbbreviatedText(String message, @NotNull MinecraftClient client, int width) {
+        if (!(client.textRenderer.getWidth(message) > width)) return message;
+        String text = client.textRenderer.trimToWidth(message, width);
+        return text.substring(0, text.length() - 3) + "...";
     }
 
     public static void sendMessage(@NotNull ClientPlayerEntity player) {

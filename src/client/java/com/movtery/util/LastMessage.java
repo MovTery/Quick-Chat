@@ -20,6 +20,7 @@ public class LastMessage {
     public void setLastTime(long lastTime) {
         this.lastTime = lastTime;
     }
+
     public long getLastClick() {
         return lastClick;
     }
@@ -28,11 +29,11 @@ public class LastMessage {
         this.lastClick = lastClick;
     }
 
-    public void setLastMessage(String lastMessage) {
-        this.lastMessage = lastMessage;
-    }
-
     public String getLastMessage() {
         return lastMessage;
+    }
+
+    public void setLastMessage(String lastMessage) {
+        this.lastMessage = lastMessage;
     }
 }

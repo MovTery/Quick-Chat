@@ -26,7 +26,6 @@
 		]
 	},
 	"mixins": [
-		"quick_chat.mixins.json",
 		{
 			"config": "quick_chat.client.mixins.json",
 			"environment": "client"

@@ -22,12 +22,12 @@ import static net.minecraft.client.option.GameOptions.getGenericValueText;
 public class ConfigScreen extends Screen {
     private final Screen parent;
     private final Config config = getConfig();
-    private final Config.Options options = config.getOptions();
+    private final Config.Options options = this.config.getOptions();
     private boolean textEmpty;
     private TextFieldWidget textField;
     private ButtonWidget messageListButton;
-    private CyclingButtonWidget<Boolean> antiFalseContactButton, messageCoolingDownButton;
-    private ClickableWidget cooldownDurationButton;
+    private CyclingButtonWidget<Boolean> antiFalseContactButton, chatQuickMessageButton, messageCoolingDownButton;
+    private ClickableWidget cooldownDurationButton, chatQuickMessageButtonWidth;
 
     public ConfigScreen(Screen parent) {
         super(Text.translatable("quick_chat.name"));
@@ -48,16 +48,19 @@ public class ConfigScreen extends Screen {
         this.setInitialFocus(this.textField);
 
         //按钮
-        this.addDrawableChild(antiFalseContactButton);
-        this.addDrawableChild(messageListButton);
-        this.addDrawableChild(messageCoolingDownButton);
-        this.addDrawableChild(cooldownDurationButton);
+        this.addDrawableChild(this.antiFalseContactButton);
+        this.addDrawableChild(this.messageListButton);
+        this.addDrawableChild(this.chatQuickMessageButton);
+        this.addDrawableChild(this.chatQuickMessageButtonWidth);
+        this.addDrawableChild(this.messageCoolingDownButton);
+        this.addDrawableChild(this.cooldownDurationButton);
 
         this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
-                .dimensions(this.width / 2 - 95, this.height / 2 + 40, 190, 20)
+                .dimensions(this.width / 2 - 95, this.height / 2 + 60, 190, 20)
                 .build());
 
-        cooldownDurationButton.active = options.messageCoolingDown;
+        this.cooldownDurationButton.active = this.options.messageCoolingDown;
+        this.chatQuickMessageButtonWidth.active = this.options.chatQuickMessageButton;
     }
 
     @Override
@@ -68,7 +71,7 @@ public class ConfigScreen extends Screen {
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 26, 16777215);
         context.drawTextWithShadow(this.textRenderer, Text.translatable("quick_chat.config.message")
                         .append(this.textEmpty ? Text.translatable("quick_chat.config.message.empty") : Text.literal("")),
-                this.width / 2 - 150, this.height / 2 - 60, this.textEmpty ? Color.RED.getRGB() : 16777215); //如果消息内容为空，那么加入提醒，颜色设置为红色
+                this.width / 2 - 150, this.height / 2 - 66, this.textEmpty ? Color.RED.getRGB() : 16777215); //如果消息内容为空，那么加入提醒，颜色设置为红色
     }
 
     @Override
@@ -82,59 +85,81 @@ public class ConfigScreen extends Screen {
     public void close() {
         if (this.client == null) return;
 
-        if (saveText(this.client)) this.client.setScreen(parent);
+        if (saveText(this.client)) this.client.setScreen(this.parent);
     }
 
     private void bindButton() {
         if (this.client == null) return;
 
         //消息内容控制
-        this.textField = new TextFieldWidget(this.textRenderer, this.width / 2 - 150, this.height / 2 - 46, 300, 20, Text.translatable("quick_chat.gui.add_message.title"));
+        this.textField = new TextFieldWidget(this.textRenderer, this.width / 2 - 150, this.height / 2 - 52, 300, 20, Text.translatable("quick_chat.gui.add_message.title"));
         this.textField.setMaxLength(256);
-        this.textField.setText(this.textEmpty ? "" : options.messageValue);
-        this.textField.setTooltip(Tooltip.of(Text.translatable("quick_chat.config.message.desc")));
+        this.textField.setText(this.textEmpty ? "" : this.options.messageValue);
 
         //防误触
-        antiFalseContactButton = getCyclingButtonWidget(options.antiFalseContact,
+        this.antiFalseContactButton = getCyclingButtonWidget(this.options.antiFalseContact,
                 "quick_chat.config.anti_false_contact",
                 "quick_chat.config.anti_false_contact.desc",
-                this.width / 2 - 150, this.height / 2 - 20,
+                this.width / 2 - 150, this.height / 2 - 26,
                 (button, value) -> {
-                    options.antiFalseContact = value;
-                    config.save();
+                    this.options.antiFalseContact = value;
+                    this.config.save();
                 });
 
         //快捷消息列表
-        messageListButton = ButtonWidget.builder(Text.translatable("quick_chat.gui.message_list.title"), button -> {
+        this.messageListButton = ButtonWidget.builder(Text.translatable("quick_chat.gui.message_list.title"), button -> {
                     if (this.client == null) return;
 
                     if (saveText(this.client)) this.client.setScreen(new QuickMessageListScreen(this));
                 }).tooltip(Tooltip.of(Text.translatable("quick_chat.config.message_list.desc")))
-                .dimensions(this.width / 2 + 2, this.height / 2 - 20, 148, 20)
+                .dimensions(this.width / 2 + 2, this.height / 2 - 26, 148, 20)
                 .build();
 
+        //聊天栏内快捷消息列表
+        this.chatQuickMessageButton = getCyclingButtonWidget(this.options.chatQuickMessageButton,
+                "quick_chat.config.chat_button",
+                "quick_chat.config.chat_button.desc",
+                this.width / 2 - 150, this.height / 2,
+                (button, value) -> {
+                    this.options.chatQuickMessageButton = value;
+                    this.chatQuickMessageButtonWidth.active = value;
+                    this.config.save();
+                });
+
+        //快捷消息按钮宽度
+        this.chatQuickMessageButtonWidth = new SimpleOption<>("quick_chat.config.chat_button.width",
+                value -> Tooltip.of(Text.translatable("quick_chat.config.chat_button.width.desc")),
+                (optionText, value) -> getGenericValueText(optionText, Text.literal(value + "px")),
+                new SimpleOption.ValidatingIntSliderCallbacks(60, 200),
+                Codec.INT.xmap(aInt -> 60, aInt -> 200),
+                this.options.chatQuickMessageButtonWidth,
+                aInt -> {
+                    this.options.chatQuickMessageButtonWidth = aInt;
+                    this.config.save();
+                }).createWidget(this.client.options, this.width / 2 + 2, this.height / 2, 148);
+
         //消息冷却
-        messageCoolingDownButton = getCyclingButtonWidget(options.messageCoolingDown,
+        this.messageCoolingDownButton = getCyclingButtonWidget(this.options.messageCoolingDown,
                 "quick_chat.config.cooldown",
                 "quick_chat.config.cooldown.desc",
-                this.width / 2 - 150, this.height / 2 + 6,
+                this.width / 2 - 150, this.height / 2 + 26,
                 (button, value) -> {
-                    options.messageCoolingDown = value;
-                    cooldownDurationButton.active = value;
-                    config.save();
+                    this.options.messageCoolingDown = value;
+                    this.cooldownDurationButton.active = value;
+                    this.config.save();
                 });
 
         //消息冷却时长
-        cooldownDurationButton = new SimpleOption<>("quick_chat.config.cooldown_duration",
+        this.cooldownDurationButton = new SimpleOption<>("quick_chat.config.cooldown_duration",
                 value -> Tooltip.of(Text.translatable("quick_chat.config.cooldown_duration.desc")),
                 (optionText, value) -> getGenericValueText(optionText, Text.literal(value + "s")),
                 new SimpleOption.ValidatingIntSliderCallbacks(1, 15),
                 Codec.INT.xmap(aInt -> 1, aInt -> 15),
-                options.messageCoolingDuration,
+                this.options.messageCoolingDuration,
                 aInt -> {
-                    options.messageCoolingDuration = aInt;
-                    config.save();
-                }).createWidget(this.client.options, this.width / 2 + 2, this.height / 2 + 6, 148);
+                    this.options.messageCoolingDuration = aInt;
+                    this.config.save();
+                }).createWidget(this.client.options, this.width / 2 + 2, this.height / 2 + 26, 148);
     }
 
     private CyclingButtonWidget<Boolean> getCyclingButtonWidget(boolean init, String option, String tooltip, int x, int y, CyclingButtonWidget.UpdateCallback<Boolean> updateCallback) {
@@ -148,14 +173,14 @@ public class ConfigScreen extends Screen {
         //切换屏幕之前需要保存文本，如果为空则不允许切换屏幕
         String text = this.textField.getText();
         if (text.isEmpty()) {
-            client.setScreen(new ConfigScreen(parent, true));
+            client.setScreen(new ConfigScreen(this.parent, true));
             return false;
         } else {
             this.textEmpty = false;
         }
 
-        options.messageValue = text;
-        config.save();
+        this.options.messageValue = text;
+        this.config.save();
         return true;
     }
 }
