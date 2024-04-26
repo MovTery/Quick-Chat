@@ -51,6 +51,8 @@ public class Config {
     public static class Options {
         public String messageValue = "Hello!";
         public boolean antiFalseContact = false;
+        public boolean chatQuickMessageButton = true;
+        public int chatQuickMessageButtonWidth = 80;
         public boolean messageCoolingDown = true;
         public int messageCoolingDuration = 10;
 
