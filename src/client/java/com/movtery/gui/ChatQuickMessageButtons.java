@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
+import static com.movtery.config.Config.chatQuickMessageButtonWidthRange;
 import static com.movtery.util.QuickChatUtils.*;
 
 public class ChatQuickMessageButtons {
@@ -48,7 +49,7 @@ public class ChatQuickMessageButtons {
     }
 
     private int addButton(int width, int height, ArrayList<TransparentButton> buttons) {
-        int buttonWidth = this.options.chatQuickMessageButtonWidth;
+        int buttonWidth = this.options.chatQuickMessageButtonWidth > chatQuickMessageButtonWidthRange[1] ? chatQuickMessageButtonWidthRange[1] : Math.max(this.options.chatQuickMessageButtonWidth, chatQuickMessageButtonWidthRange[0]);
         int[] data = {1, width + 18, buttonWidth};
         this.options.message.forEach(s -> {
             int y = ((20 + 2) * data[0]) + 40;

@@ -22,13 +22,10 @@ public class TransparentButton extends MouseClicksOnlyButton {
         context.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        context.drawTexture(this.active ? new Identifier("quick_chat", "textures/gui/transparent_button.png") : new Identifier("quick_chat", "textures/gui/transparent_button_disabled.png"), this.getX(), this.getY(), 0, this.getHeight(), this.getWidth(), this.getHeight(), 200, 20);
-        if (this.isSelected()) {
-            //左边界
-            context.drawTexture(new Identifier("quick_chat", "textures/gui/transparent_button_highlighted.png"), this.getX(), this.getY(), 0, this.getHeight(), this.getWidth(), this.getHeight(), 200, 20);
-            //右边界
-            context.drawTexture(new Identifier("quick_chat", "textures/gui/transparent_button_highlighted.png"), this.getX(), this.getY(), -this.getWidth(), this.getHeight(), this.getWidth(), this.getHeight(), 200, 20);
-        }
+
+        if (!this.isSelected()) context.drawTexture(this.active ? new Identifier("quick_chat", "textures/gui/transparent_button.png") : new Identifier("quick_chat", "textures/gui/transparent_button_disabled.png"), this.getX(), this.getY(), 0, this.getHeight(), this.getWidth(), this.getHeight(), 200, 20);
+        else context.drawTexture(new Identifier("quick_chat", "textures/gui/transparent_button_highlighted.png"), this.getX(), this.getY(), 0, this.getHeight(), this.getWidth(), this.getHeight(), 200, 20);
+
         context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int i = this.active ? 16777215 : 10526880;
         this.drawMessage(context, minecraftClient.textRenderer, i | MathHelper.ceil(this.alpha * 255.0F) << 24);

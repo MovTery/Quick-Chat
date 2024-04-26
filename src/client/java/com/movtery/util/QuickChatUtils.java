@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import static com.movtery.QuickChatClient.*;
+import static com.movtery.config.Config.messageCoolingDurationRange;
 
 public class QuickChatUtils {
     private static Config config = null;
@@ -121,8 +122,7 @@ public class QuickChatUtils {
 
         Config.Options options = getConfig().getOptions();
         double duration = Math.abs(options.messageCoolingDuration);
-        duration = Math.min(duration, Config.messageCoolingDurationRange[1]);
-        duration = Math.max(duration, Config.messageCoolingDurationRange[0]);
+        duration = duration > messageCoolingDurationRange[1] ? messageCoolingDurationRange[1] : Math.max(duration, messageCoolingDurationRange[0]);
 
         //检查上一次发送消息的时间，如果间隔时间不符合要求则提示过于频繁，不再发送消息
         long differ = timeNum - lastTime; //计算时间差
