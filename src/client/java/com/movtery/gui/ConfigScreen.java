@@ -16,7 +16,7 @@ import net.minecraft.text.Text;
 
 import java.awt.*;
 
-import static com.movtery.util.QuickChatUtils.getConfig;
+import static com.movtery.QuickChatClient.getConfig;
 import static net.minecraft.client.option.GameOptions.getGenericValueText;
 
 public class ConfigScreen extends Screen {

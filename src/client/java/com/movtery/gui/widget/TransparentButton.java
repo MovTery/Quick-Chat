@@ -1,17 +1,17 @@
 package com.movtery.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 public class TransparentButton extends MouseClicksOnlyButton {
+    private long lastClickTime = 0;
+
     public TransparentButton(int x, int y, int width, int height, Text message, PressAction onPress) {
         super(x, y, width, height, message, onPress, textSupplier -> message.copy());
     }
@@ -23,15 +23,30 @@ public class TransparentButton extends MouseClicksOnlyButton {
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
 
-        if (!this.isSelected()) context.drawTexture(this.active ? new Identifier("quick_chat", "textures/gui/transparent_button.png") : new Identifier("quick_chat", "textures/gui/transparent_button_disabled.png"), this.getX(), this.getY(), 0, this.getHeight(), this.getWidth(), this.getHeight(), 200, 20);
-        else context.drawTexture(new Identifier("quick_chat", "textures/gui/transparent_button_highlighted.png"), this.getX(), this.getY(), 0, this.getHeight(), this.getWidth(), this.getHeight(), 200, 20);
+        int color;
+        if (this.isSelected()) color = packARGB(77, 255, 255, 255);
+        else if (!this.active) color = packARGB(200, 0, 0, 0);
+        else color = packARGB(128, 0, 0, 0);
+
+        context.fill(this.getX(), this.getY() + this.getHeight(), this.getX() + this.getWidth(), this.getY(), color);
 
         context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int i = this.active ? 16777215 : 10526880;
         this.drawMessage(context, minecraftClient.textRenderer, i | MathHelper.ceil(this.alpha * 255.0F) << 24);
     }
 
-    @Environment(EnvType.CLIENT)
+    private int packARGB(int alpha, int red, int green, int blue) {
+        return (alpha << 24) | (red << 16) | (green << 8) | blue;
+    }
+
+    public boolean notDoubleClick() {
+        long clickTime = Util.getMeasuringTimeMs();
+        boolean isDoubleClick = clickTime - lastClickTime < 250L;
+        lastClickTime = clickTime;
+
+        return !isDoubleClick;
+    }
+
     public static class Builder {
         private final Text message;
         private final PressAction onPress;
