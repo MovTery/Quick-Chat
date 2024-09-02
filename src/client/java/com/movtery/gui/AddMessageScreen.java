@@ -1,6 +1,7 @@
 package com.movtery.gui;
 
 import com.movtery.config.Config;
+import com.movtery.util.QuickChatUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -8,7 +9,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 
-import static com.movtery.util.QuickChatUtils.getConfig;
+import static com.movtery.QuickChatClient.getConfig;
 import static net.minecraft.screen.ScreenTexts.CANCEL;
 
 public class AddMessageScreen extends Screen {
@@ -66,7 +67,7 @@ public class AddMessageScreen extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
-        } else if (keyCode != 257 && keyCode != 335) {
+        } else if (!QuickChatUtils.isEnter(keyCode)) {
             return false;
         } else {
             this.addMessage();

@@ -5,11 +5,11 @@
   "modmenu.descriptionTranslation.quick_chat": "通过按键快速发送消息。",
 
   "quick_chat.keybinding.one_click": "一键发送",
+  "quick_chat.keybinding.config": "打开配置屏幕",
   "quick_chat.keybinding.quick_message": "打开快捷消息列表屏幕",
 
   "quick_chat.in_game.too_often": "消息发送过于频繁！",
 
-  "quick_chat.config.reloaded": "配置文件已重载!",
   "quick_chat.config.message": "消息内容",
   "quick_chat.config.message.empty": "（该内容不能为空！）",
   "quick_chat.config.message.desc": "设置快捷消息发送的内容\n\n在内容开头处加上 \"/\" 符号，游戏会将其作为命令执行",

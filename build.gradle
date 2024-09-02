@@ -14,6 +14,7 @@ repositories {
 	mavenCentral()
 
 	maven { url "https://maven.terraformersmc.com/releases/" } // Mod Menu
+	maven { url "https://maven.nucleoid.xyz/" } // Placeholder API
 }
 
 loom {
@@ -37,6 +38,7 @@ dependencies {
 	// Fabric API.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "com.terraformersmc:modmenu:$project.modmenu"
+	modImplementation "eu.pb4:placeholder-api:$project.placeholder"
 }
 
 processResources {

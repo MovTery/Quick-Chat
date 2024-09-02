@@ -2,15 +2,13 @@ package com.movtery.gui;
 
 import com.movtery.config.Config;
 import com.movtery.util.LastMessage;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import com.movtery.util.QuickChatUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.input.KeyCodes;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -22,9 +20,10 @@ import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.movtery.util.QuickChatUtils.*;
+import static com.movtery.QuickChatClient.getConfig;
+import static com.movtery.util.QuickChatUtils.getAbbreviatedText;
+import static com.movtery.util.QuickChatUtils.sendMessage;
 
-@Environment(EnvType.CLIENT)
 public class QuickMessageListScreen extends Screen {
     private final Screen parent;
     private final Config config = getConfig();
@@ -73,15 +72,15 @@ public class QuickMessageListScreen extends Screen {
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 16, 16777215);
         context.drawCenteredTextWithShadow(this.textRenderer,
                 Text.literal(String.format("(%d) ", this.messageListWidget.children().size())).formatted(Formatting.YELLOW)
-                .append(message.isEmpty() ?
-                        Text.translatable("quick_chat.gui.message_list.tip_empty").formatted(Formatting.RED) :
-                        Text.translatable("quick_chat.gui.message_list.tip").formatted(Formatting.WHITE)),
+                        .append(message.isEmpty() ?
+                                Text.translatable("quick_chat.gui.message_list.tip_empty").formatted(Formatting.RED) :
+                                Text.translatable("quick_chat.gui.message_list.tip").formatted(Formatting.WHITE)),
                 this.width / 2, this.height - 54, 16777215);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (MinecraftClient.getInstance().player != null && KeyCodes.isToggle(keyCode)) {
+        if (MinecraftClient.getInstance().player != null && QuickChatUtils.isEnter(keyCode)) {
             this.onDone();
         }
 
@@ -92,8 +91,8 @@ public class QuickMessageListScreen extends Screen {
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelectedOrNull();
         if (this.client == null) close();
 
-        if (messageListEntry != null && this.client.player != null) {
-            sendMessage(this.client.player, messageListEntry.message.get(messageListEntry.key));
+        if (messageListEntry != null) {
+            sendMessage(this.client, messageListEntry.message.get(messageListEntry.abbreviatedText));
         }
 
         this.close();
@@ -104,7 +103,7 @@ public class QuickMessageListScreen extends Screen {
         if (messageListEntry != null) {
             TreeSet<String> message = config.getOptions().message;
             if (!message.isEmpty()) {
-                message.remove(messageListEntry.message.get(messageListEntry.key));
+                message.remove(messageListEntry.message.get(messageListEntry.abbreviatedText));
             }
             config.save();
         }
@@ -123,11 +122,10 @@ public class QuickMessageListScreen extends Screen {
         if (this.client == null) return;
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelectedOrNull();
         if (messageListEntry != null) {
-            this.client.setScreen(new AddMessageScreen(this, messageListEntry.message.get(messageListEntry.key)));
+            this.client.setScreen(new AddMessageScreen(this, messageListEntry.message.get(messageListEntry.abbreviatedText)));
         }
     }
 
-    @Environment(EnvType.CLIENT)
     private class MessageListWidget extends AlwaysSelectedEntryListWidget<MessageListWidget.MessageListEntry> {
         public MessageListWidget(MinecraftClient client) {
             super(client, QuickMessageListScreen.this.width, QuickMessageListScreen.this.height - 93, 32, 18);
@@ -153,19 +151,26 @@ public class QuickMessageListScreen extends Screen {
             return this.width / 2 + 8;
         }
 
-        @Environment(EnvType.CLIENT)
+        @Override
+        protected int getScrollbarPositionX() {
+            return this.width / 2 + (getRowWidth() / 2) + 8;
+        }
+
         public class MessageListEntry extends AlwaysSelectedEntryListWidget.Entry<MessageListWidget.MessageListEntry> {
+            final Tooltip tooltip;
             final Map<String, String> message = new HashMap<>();
-            final String key;
+            final String abbreviatedText;
             private long clickTime;
 
             public MessageListEntry(String message) {
-                this.key = getAbbreviatedText(message, client, QuickMessageListScreen.this.width / 2 - 8);
-                this.message.put(this.key, message);
+                this.abbreviatedText = getAbbreviatedText(message, client, QuickMessageListScreen.this.width / 2 - 8);
+                this.message.put(this.abbreviatedText, message);
+                tooltip = Tooltip.of(Text.literal(message));
             }
 
             public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                context.drawCenteredTextWithShadow(client.textRenderer, this.key, MessageListWidget.this.width / 2, y + 1, 16777215);
+                context.drawCenteredTextWithShadow(client.textRenderer, this.abbreviatedText, MessageListWidget.this.width / 2, y + 1, 16777215);
+                this.tooltip.render(this.isMouseOver(mouseX, mouseY), this.isFocused(), this.getNavigationFocus());
             }
 
             public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -183,7 +188,7 @@ public class QuickMessageListScreen extends Screen {
             }
 
             public Text getNarration() {
-                return Text.literal(this.message.get(key));
+                return Text.literal(this.message.get(abbreviatedText));
             }
         }
     }

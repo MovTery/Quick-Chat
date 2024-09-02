@@ -16,7 +16,7 @@ import net.minecraft.text.Text;
 
 import java.awt.*;
 
-import static com.movtery.util.QuickChatUtils.getConfig;
+import static com.movtery.QuickChatClient.getConfig;
 import static net.minecraft.client.option.GameOptions.getGenericValueText;
 
 public class ConfigScreen extends Screen {
@@ -95,6 +95,7 @@ public class ConfigScreen extends Screen {
         this.textField = new TextFieldWidget(this.textRenderer, this.width / 2 - 150, this.height / 2 - 52, 300, 20, Text.translatable("quick_chat.gui.add_message.title"));
         this.textField.setMaxLength(256);
         this.textField.setText(this.textEmpty ? "" : this.options.messageValue);
+        this.textField.setTooltip(Tooltip.of(Text.translatable("quick_chat.config.message.desc")));
 
         //防误触
         this.antiFalseContactButton = getCyclingButtonWidget(this.options.antiFalseContact,

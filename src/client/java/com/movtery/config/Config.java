@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collections;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class Config {
@@ -30,6 +31,14 @@ public class Config {
         if (file.exists()) {
             try {
                 options = GSON.fromJson(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8), Options.class);
+                Set<String> invalidValue = new TreeSet<>();
+                options.message.forEach(v -> {
+                    if (v.length() > 256) invalidValue.add(v);
+                });
+                if (!invalidValue.isEmpty()) {
+                    options.message.removeAll(invalidValue);
+                    save();
+                }
             } catch (IOException e) {
                 QuickChatClient.LOGGER.error("Error loading config");
             }
