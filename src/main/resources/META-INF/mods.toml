@@ -9,6 +9,9 @@ displayName="${mod_name}"
 authors="${mod_authors}"
 description='''${mod_description}'''
 
+[[mixins]]
+config="${mod_id}.mixins.json"
+
 logoFile="quick_chat.x128.png"
 
 [[dependencies.${mod_id}]]

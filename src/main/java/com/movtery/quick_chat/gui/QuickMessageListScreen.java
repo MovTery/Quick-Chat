@@ -2,6 +2,7 @@ package com.movtery.quick_chat.gui;
 
 import com.movtery.quick_chat.config.Config;
 import com.movtery.quick_chat.util.LastMessage;
+import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -9,17 +10,19 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.movtery.quick_chat.util.QuickChatUtils.getConfig;
+import static com.movtery.quick_chat.QuickChat.getConfig;
+import static com.movtery.quick_chat.util.QuickChatUtils.getAbbreviatedText;
 import static com.movtery.quick_chat.util.QuickChatUtils.sendMessage;
 
 public class QuickMessageListScreen extends Screen {
@@ -64,8 +67,8 @@ public class QuickMessageListScreen extends Screen {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics pGuiGraphics, int mouseX, int mouseY, float delta) {
-        super.render(pGuiGraphics, mouseX, mouseY, delta);
+    public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         TreeSet<String> message = config.getOptions().message;
         pGuiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 16777215);
         pGuiGraphics.drawCenteredString(this.font,
@@ -78,7 +81,7 @@ public class QuickMessageListScreen extends Screen {
 
     @Override
     public boolean keyPressed(int pKeyCode, int scanCode, int modifiers) {
-        if (CommonInputs.selected(pKeyCode)) {
+        if (Minecraft.getInstance().player != null && QuickChatUtils.isEnter(pKeyCode)) {
             this.onDone();
         }
 
@@ -89,8 +92,8 @@ public class QuickMessageListScreen extends Screen {
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelected();
         if (this.minecraft == null) onClose();
 
-        if (messageListEntry != null && this.minecraft.player != null) {
-            sendMessage(this.minecraft.player, messageListEntry.message);
+        if (messageListEntry != null) {
+            sendMessage(this.minecraft, messageListEntry.message.get(messageListEntry.abbreviatedText));
         }
 
         this.onClose();
@@ -101,7 +104,7 @@ public class QuickMessageListScreen extends Screen {
         if (messageListEntry != null) {
             TreeSet<String> message = config.getOptions().message;
             if (!message.isEmpty()) {
-                message.remove(messageListEntry.message);
+                message.remove(messageListEntry.message.get(messageListEntry.abbreviatedText));
             }
             config.save();
         }
@@ -120,7 +123,7 @@ public class QuickMessageListScreen extends Screen {
         if (this.minecraft == null) return;
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelected();
         if (messageListEntry != null) {
-            this.minecraft.setScreen(new AddMessageScreen(this, messageListEntry.message));
+            this.minecraft.setScreen(new AddMessageScreen(this, messageListEntry.message.get(messageListEntry.abbreviatedText)));
         }
     }
 
@@ -146,24 +149,24 @@ public class QuickMessageListScreen extends Screen {
 
         @Override
         public int getRowWidth() {
-            MessageListEntry messageListEntry = QuickMessageListScreen.this.messageListWidget.getSelected();
-            if (messageListEntry == null) return super.getRowWidth();
-
-            //根据显示的文本的实际宽度来设置选择框宽度
-            return Math.min((int) QuickMessageListScreen.this.font.getSplitter().stringWidth(messageListEntry.message) + 200, this.width);
+            return this.width / 2 + 8;
         }
 
         public class MessageListEntry extends ObjectSelectionList.Entry<MessageListEntry> {
-            final String message;
+            final Tooltip tooltip;
+            final Map<String, String> message = new HashMap<>();
+            final String abbreviatedText;
             private long clickTime;
 
             public MessageListEntry(String message) {
-                this.message = message;
+                this.abbreviatedText = getAbbreviatedText(message, minecraft, QuickMessageListScreen.this.width / 2 - 8);
+                this.message.put(this.abbreviatedText, message);
+                tooltip = Tooltip.create(Component.literal(message));
             }
 
-            @Override
-            public void render(GuiGraphics pGuiGraphics, int pIndex, int pTop, int pLeft, int pWidth, int pHeight, int pMouseX, int pMouseY, boolean pHovering, float pPartialTick) {
-                pGuiGraphics.drawCenteredString(minecraft.font, this.message, MessageListWidget.this.width / 2, pTop + 1, 16777215);
+            public void render(@NotNull GuiGraphics pGuiGraphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+                pGuiGraphics.drawCenteredString(minecraft.font, this.abbreviatedText, MessageListWidget.this.width / 2, y + 1, 16777215);
+                this.tooltip.refreshTooltipForNextRenderPass(this.isMouseOver(mouseX, mouseY), this.isFocused(), this.getRectangle());
             }
 
             public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -180,9 +183,8 @@ public class QuickMessageListScreen extends Screen {
                 MessageListWidget.this.setSelected(this);
             }
 
-            @Override
             public @NotNull Component getNarration() {
-                return Component.literal(this.message);
+                return Component.literal(this.message.get(abbreviatedText));
             }
         }
     }

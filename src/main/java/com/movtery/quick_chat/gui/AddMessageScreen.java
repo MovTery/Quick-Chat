@@ -1,6 +1,7 @@
 package com.movtery.quick_chat.gui;
 
 import com.movtery.quick_chat.config.Config;
+import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -10,7 +11,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-import static com.movtery.quick_chat.util.QuickChatUtils.getConfig;
+import static com.movtery.quick_chat.QuickChat.getConfig;
 
 public class AddMessageScreen extends Screen {
     private final Screen parent;
@@ -49,9 +50,9 @@ public class AddMessageScreen extends Screen {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics pGuiGraphics, int mouseX, int mouseY, float delta) {
-        super.render(pGuiGraphics, mouseX, mouseY, delta);
-        this.messageField.render(pGuiGraphics, mouseX, mouseY, delta);
+    public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        this.messageField.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         pGuiGraphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 74, 16777215);
         pGuiGraphics.drawWordWrap(this.font, Component.translatable("quick_chat.config.message.desc"), this.width / 2 - 150, this.height / 2 + 24, 500, 16777215);
     }
@@ -67,7 +68,7 @@ public class AddMessageScreen extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
-        } else if (keyCode != 257 && keyCode != 335) {
+        } else if (!QuickChatUtils.isEnter(keyCode)) {
             return false;
         } else {
             this.addMessage();

@@ -1,23 +1,30 @@
 {
   "quick_chat.name": "快捷聊天",
 
+  "modmenu.nameTranslation.quick_chat": "快捷聊天",
+  "modmenu.descriptionTranslation.quick_chat": "通过按键快速发送消息。",
+
   "quick_chat.keybinding.one_click": "一键发送",
+  "quick_chat.keybinding.config": "打开配置屏幕",
   "quick_chat.keybinding.quick_message": "打开快捷消息列表屏幕",
 
   "quick_chat.in_game.too_often": "消息发送过于频繁！",
 
-  "quick_chat.config.reloaded": "配置文件已重载!",
   "quick_chat.config.message": "消息内容",
   "quick_chat.config.message.empty": "（该内容不能为空！）",
-  "quick_chat.config.message.desc": "设置快捷消息发送的内容\n\n在内容开头处加上 \"/\" 符号，Mod 会将其作为命令执行",
+  "quick_chat.config.message.desc": "设置快捷消息发送的内容\n\n在内容开头处加上 \"/\" 符号，游戏会将其作为命令执行",
   "quick_chat.config.anti_false_contact": "防误触",
-  "quick_chat.config.anti_false_contact.desc": "开启后，你需要双击快捷键后才能快捷发送消息，避免误触",
+  "quick_chat.config.anti_false_contact.desc": "开启后，在游戏内通过快捷键，或者聊天栏内的快捷消息列表发送消息时，需要双击才能快捷发送消息，避免误触",
   "quick_chat.config.message_list": "打开快捷消息列表",
   "quick_chat.config.message_list.desc": "你可以在此屏幕内添加更多的快捷消息，进入游戏后可以通过按键绑定快速打开此屏幕，然后发送你想要的内容！",
   "quick_chat.config.cooldown": "发送冷却",
   "quick_chat.config.cooldown.desc": "如果关闭，冷却时长则会被指定为 0.5s",
   "quick_chat.config.cooldown_duration": "冷却时长",
   "quick_chat.config.cooldown_duration.desc": "设置发送消息的间隔时长",
+  "quick_chat.config.chat_button": "聊天栏内快捷消息列表",
+  "quick_chat.config.chat_button.desc": "如果开启，聊天栏内将列出快捷消息列表内的快捷内容，可以通过点击这些快捷按钮来快捷发送消息",
+  "quick_chat.config.chat_button.width": "快捷消息按钮宽度",
+  "quick_chat.config.chat_button.width.desc": "设置聊天栏内快捷消息按钮的宽度",
 
   "quick_chat.gui.message_list.title": "快捷消息列表",
   "quick_chat.gui.message_list.tip_empty": "没有可用的消息，请添加新的消息！",

@@ -1,34 +1,39 @@
 {
   "quick_chat.name": "Quick Chat",
 
-  "quick_chat.keybinding.one_click": "One-click Send",
+  "modmenu.nameTranslation.quick_chat": "Quick Chat",
+  "modmenu.descriptionTranslation.quick_chat": "Send messages quickly with a key press.",
+
+  "quick_chat.keybinding.one_click": "One-Click Send",
+  "quick_chat.keybinding.config": "Open Config Screen",
   "quick_chat.keybinding.quick_message": "Open Quick Message List Screen",
 
-  "quick_chat.in_game.too_often": "Message sent too often!",
+  "quick_chat.in_game.too_often": "Message sent too frequently!",
 
-  "quick_chat.config.reloaded": "Config file reloaded!",
   "quick_chat.config.message": "Message Content",
   "quick_chat.config.message.empty": "(This content cannot be empty!)",
-  "quick_chat.config.message.desc": "Set the content to be sent as quick messages\n\nStart with \"/\" for Mod command execution",
-  "quick_chat.config.anti_false_contact": "Anti False Contact",
-  "quick_chat.config.anti_false_contact.desc": "When enabled, you need to double-click the hotkey to send the message, avoiding accidental triggers",
+  "quick_chat.config.message.desc": "Set the content for quick message sending\n\nPrefix the content with \"/\" to execute it as a command",
+  "quick_chat.config.anti_false_contact": "Anti-False Touch",
+  "quick_chat.config.anti_false_contact.desc": "When enabled, messages sent via quick keys or the quick message list in the chat bar require a double-click to send, preventing accidental activation",
   "quick_chat.config.message_list": "Open Quick Message List",
-  "quick_chat.config.message_list.desc": "You can add more quick messages in this screen. After entering the game, you can quickly open this screen by pressing the key binding, then send the content you want!",
+  "quick_chat.config.message_list.desc": "You can add more quick messages here. In-game, you can quickly open this screen via key binding and send the content you want!",
   "quick_chat.config.cooldown": "Send Cooldown",
-  "quick_chat.config.cooldown.desc": "If turned off, cooldown duration will be set to 0.5s",
+  "quick_chat.config.cooldown.desc": "If disabled, the cooldown duration will be set to 0.5s",
   "quick_chat.config.cooldown_duration": "Cooldown Duration",
-  "quick_chat.config.cooldown_duration.desc": "Set the interval for sending messages",
+  "quick_chat.config.cooldown_duration.desc": "Set the interval duration between message sends",
+  "quick_chat.config.chat_button": "Quick Message List in Chat Bar",
+  "quick_chat.config.chat_button.desc": "If enabled, the chat bar will list quick messages, allowing you to send them quickly by clicking these buttons",
+  "quick_chat.config.chat_button.width": "Quick Message Button Width",
+  "quick_chat.config.chat_button.width.desc": "Set the width of the quick message buttons in the chat bar",
 
   "quick_chat.gui.message_list.title": "Quick Message List",
   "quick_chat.gui.message_list.tip_empty": "No messages available, please add new messages!",
-  "quick_chat.gui.message_list.tip": "Select a message, you can delete, edit, or send it!",
+  "quick_chat.gui.message_list.tip": "Select a message to delete, edit, or send it!",
   "quick_chat.gui.message_list.add": "Add",
   "quick_chat.gui.message_list.edit": "Edit",
   "quick_chat.gui.message_list.remove": "Remove",
   "quick_chat.gui.message_list.send": "Send",
   "quick_chat.gui.message_list.send_not_in_game": "Please enter the game before using this feature!",
   "quick_chat.gui.add_message.title": "Edit Quick Message",
-  "quick_chat.gui.add_message.add": "Confirm",
-
-  "quick_chat.options.second_value": "%s: %ss"
+  "quick_chat.gui.add_message.add": "Confirm"
 }

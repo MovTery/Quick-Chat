@@ -1,66 +1,65 @@
 package com.movtery.quick_chat.util;
 
 import com.movtery.quick_chat.config.Config;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.neoforged.fml.loading.FMLLoader;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Path;
 import java.util.Date;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
-import static com.movtery.quick_chat.QuickChat.MODID;
+import static com.movtery.quick_chat.QuickChat.getConfig;
+import static com.movtery.quick_chat.config.Config.messageCoolingDurationRange;
 
 public class QuickChatUtils {
-    private static Config config = null;
+    public static boolean notDoubleClick() {
+        LastMessage instance = LastMessage.getInstance();
+        long clickTime = Util.getMillis();
+        //点击即进行判断，如果前后两次点击时间相差不超过0.25秒，那么表示这是一次双击
+        boolean isDoubleClick = clickTime - instance.getLastClick() < 250L;
+        instance.setLastClick(clickTime);
 
-    public static Config getConfig() {
-        if (config == null) loadConfig();
-        return config;
+        return !isDoubleClick;
     }
 
-    private static void loadConfig() {
-        String fileName = (MODID + ".json");
-        Path configPath = new File(FMLLoader.getGamePath().toString(), "config").toPath();
-        File configFile = new File(configPath + "\\" + fileName);
-        if (!configFile.exists()) {
-            boolean t;
-            try {
-                t = configFile.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            if (t) LOGGER.info("Created a new configuration file: {}", configFile.getPath());
-        }
-        config = new Config(configFile);
-        config.load();
+    public static String getAbbreviatedText(String message, @NotNull Minecraft client, int width) {
+        if (!(client.font.width(message) > width)) return message;
+        String text = client.font.plainSubstrByWidth(message, width);
+        return text.substring(0, text.length() - 3) + "...";
     }
 
-    public static void sendMessage(@NotNull LocalPlayer player) {
+    public static boolean isEnter(int keyCode) {
+        return keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER;
+    }
+
+    public static void sendMessage(@NotNull Minecraft client) {
         Config.Options options = getConfig().getOptions();
 
         String message = options.messageValue;
-        sendMessage(player, message);
+        sendMessage(client, message);
     }
 
-    public static void sendMessage(@NotNull LocalPlayer player, String message) {
+    public static void sendMessage(@NotNull Minecraft client, String message) {
+        LocalPlayer player = client.player;
+        if (player == null) return;
+
         Date date = new Date();
         long timeNum = date.getTime(); //获取当前时间
         long lastTime = LastMessage.getInstance().getLastTime(); //获取上一次发送的时间
 
         Config.Options options = getConfig().getOptions();
         double duration = Math.abs(options.messageCoolingDuration);
-        duration = Math.min(duration, Config.messageCoolingDurationRange[1]);
-        duration = Math.max(duration, Config.messageCoolingDurationRange[0]);
+        duration = duration > messageCoolingDurationRange[1] ? messageCoolingDurationRange[1] : Math.max(duration, messageCoolingDurationRange[0]);
 
         //检查上一次发送消息的时间，如果间隔时间不符合要求则提示过于频繁，不再发送消息
         long differ = timeNum - lastTime; //计算时间差
         if (!options.messageCoolingDown || (lastTime == 0 || differ > 1000 * duration)) {
             if (differ > 500) {
+                client.gui.getChat().addRecentChat(message);
+
                 if (!message.startsWith("/")) {
                     player.connection.sendChat(message);
                 } else {
