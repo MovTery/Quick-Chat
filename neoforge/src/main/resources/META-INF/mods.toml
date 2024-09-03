@@ -21,7 +21,7 @@ side = "BOTH"
 [[dependencies.quick_chat]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.20.5,1.21)"
+versionRange = "[1.20.4,1.20.5)"
 ordering = "NONE"
 side = "BOTH"
 

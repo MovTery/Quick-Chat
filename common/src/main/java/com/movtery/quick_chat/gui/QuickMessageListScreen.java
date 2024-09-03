@@ -10,7 +10,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -154,13 +153,13 @@ public class QuickMessageListScreen extends Screen {
         public class MessageListEntry extends ObjectSelectionList.Entry<MessageListEntry> {
             final Map<String, String> message = new HashMap<>();
             final String abbreviatedText;
-            private final WidgetTooltipHolder tooltip = new WidgetTooltipHolder();
+            private final Tooltip tooltip;
             private long clickTime;
 
             public MessageListEntry(String message) {
                 this.abbreviatedText = QuickChatUtils.getAbbreviatedText(message, minecraft, QuickMessageListScreen.this.width / 2 - 8);
                 this.message.put(this.abbreviatedText, message);
-                this.tooltip.set(Tooltip.create(Component.literal(message)));
+                this.tooltip = Tooltip.create(Component.literal(message));
             }
 
             @Override
