@@ -1,0 +1,29 @@
+modLoader = "javafml"
+loaderVersion = "[2,)"
+license = "MIT"
+
+[[mods]]
+modId = "quick_chat"
+version = "${version}"
+displayName = "Quick Chat"
+authors = "MovTery"
+description = "A Minecraft Mod: Send messages quickly by pressing keys."
+displayURL = "https://modrinth.com/mod/quick-chat"
+logoFile = "icon.png"
+
+[[dependencies.quick_chat]]
+modId = "neoforge"
+type = "required"
+versionRange = "[20,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.quick_chat]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.20.6,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config = "quick_chat.mixins.json"

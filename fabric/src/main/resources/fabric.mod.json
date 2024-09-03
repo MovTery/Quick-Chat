@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "quick_chat",
+  "version": "${version}",
+  "name": "Quick Chat",
+  "description": "A Minecraft Mod: Send messages quickly by pressing keys.",
+  "authors": [
+    "MovTery"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/quick-chat",
+    "sources": "https://github.com/HopiHopy/Quick-Chat"
+  },
+  "license": "MIT",
+  "icon": "icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "com.movtery.quick_chat.fabric.QuickChatFabric"
+    ],
+    "client": [
+      "com.movtery.quick_chat.fabric.client.QuickChatFabricClient"
+    ],
+    "modmenu": [
+      "com.movtery.quick_chat.fabric.integration.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "quick_chat.mixins.json"
+  ],
+  "depends": {
+    "minecraft": "~1.20.6",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
