@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[2,)"
+loaderVersion = "[47,)"
 license = "MIT"
 
 [[mods]]
@@ -12,16 +12,16 @@ displayURL = "https://modrinth.com/mod/quick-chat"
 logoFile = "icon.png"
 
 [[dependencies.quick_chat]]
-modId = "neoforge"
-type = "required"
-versionRange = "[20,)"
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.quick_chat]]
 modId = "minecraft"
-type = "required"
-versionRange = "[1.20.5,1.21)"
+mandatory = true
+versionRange = "[1.20.1,1.20.2)"
 ordering = "NONE"
 side = "BOTH"
 

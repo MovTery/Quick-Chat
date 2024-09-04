@@ -1,7 +1,7 @@
-package com.movtery.quick_chat.neoforge;
+package com.movtery.quick_chat.forge;
 
 import net.minecraft.client.KeyMapping;
-import net.neoforged.jarjar.nio.util.Lazy;
+import net.minecraftforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 
 public class ModKeyMappings {

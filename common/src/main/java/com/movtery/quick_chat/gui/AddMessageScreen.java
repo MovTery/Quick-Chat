@@ -50,6 +50,7 @@ public class AddMessageScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.messageField.render(guiGraphics, mouseX, mouseY, delta);
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 74, 16777215);

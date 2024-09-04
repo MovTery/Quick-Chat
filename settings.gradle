@@ -11,4 +11,4 @@ rootProject.name = 'Quick Chat Architectury'
 
 include 'common'
 include 'fabric'
-include 'neoforge'
+include 'forge'

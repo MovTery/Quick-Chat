@@ -10,8 +10,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -67,6 +67,7 @@ public class QuickMessageListScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
         TreeSet<String> message = config.getOptions().message;
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 16777215);
@@ -128,7 +129,7 @@ public class QuickMessageListScreen extends Screen {
 
     private class MessageListWidget extends ObjectSelectionList<MessageListWidget.MessageListEntry> {
         public MessageListWidget(Minecraft client) {
-            super(client, QuickMessageListScreen.this.width, QuickMessageListScreen.this.height - 93, 32, 18);
+            super(client, QuickMessageListScreen.this.width, QuickMessageListScreen.this.height - 93, 32, QuickMessageListScreen.this.height - 65 + 4, 18);
             TreeSet<String> message = config.getOptions().message;
             if (!message.isEmpty()) {
                 AtomicInteger i = new AtomicInteger();
@@ -154,19 +155,22 @@ public class QuickMessageListScreen extends Screen {
         public class MessageListEntry extends ObjectSelectionList.Entry<MessageListEntry> {
             final Map<String, String> message = new HashMap<>();
             final String abbreviatedText;
-            private final WidgetTooltipHolder tooltip = new WidgetTooltipHolder();
+            private final Tooltip tooltip;
             private long clickTime;
 
             public MessageListEntry(String message) {
                 this.abbreviatedText = QuickChatUtils.getAbbreviatedText(message, minecraft, QuickMessageListScreen.this.width / 2 - 8);
                 this.message.put(this.abbreviatedText, message);
-                this.tooltip.set(Tooltip.create(Component.literal(message)));
+                this.tooltip = Tooltip.create(Component.literal(message));
             }
 
             @Override
             public void render(GuiGraphics guiGraphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
                 guiGraphics.drawCenteredString(minecraft.font, this.abbreviatedText, MessageListWidget.this.width / 2, y + 1, 16777215);
-                this.tooltip.refreshTooltipForNextRenderPass(this.isMouseOver(mouseX, mouseY), this.isFocused(), this.getRectangle());
+                if (this.isMouseOver(mouseX, mouseY)) {
+                    Screen screen = Minecraft.getInstance().screen;
+                    if (screen != null) screen.setTooltipForNextRenderPass(this.tooltip, DefaultTooltipPositioner.INSTANCE, this.isFocused());
+                }
             }
 
             public boolean mouseClicked(double mouseX, double mouseY, int button) {

@@ -62,6 +62,7 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.textField.render(guiGraphics, mouseX, mouseY, delta);
 

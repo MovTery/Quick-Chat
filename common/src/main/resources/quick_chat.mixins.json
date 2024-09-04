@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "com.movtery.quick_chat.mixin.client",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
     "ChatScreenMixin"
