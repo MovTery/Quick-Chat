@@ -4,12 +4,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
-public class TransparentButton extends MouseClicksOnlyButton {
+public class TransparentButton extends Button {
     private long lastClickTime = 0;
 
     public TransparentButton(int x, int y, int width, int height, Component message, OnPress onPress) {
@@ -19,14 +20,14 @@ public class TransparentButton extends MouseClicksOnlyButton {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         Minecraft minecraft = Minecraft.getInstance();
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
+
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, minecraft.options.textBackgroundOpacity().get().floatValue());
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
 
         int color;
-        if (this.isHovered()) color = packARGB(77, 255, 255, 255);
-        else if (!this.active) color = packARGB(200, 0, 0, 0);
-        else color = packARGB(128, 0, 0, 0);
+        if (this.isHovered()) color = packRGB(255, 255, 255);
+        else color = packRGB(0, 0, 0);
 
         guiGraphics.fill(this.getX(), this.getY() + this.getHeight(), this.getX() + this.getWidth(), this.getY(), color);
 
@@ -35,8 +36,8 @@ public class TransparentButton extends MouseClicksOnlyButton {
         this.renderString(guiGraphics, minecraft.font, textColor | Mth.ceil(this.alpha * 255.0F) << 24);
     }
 
-    private int packARGB(int alpha, int red, int green, int blue) {
-        return (alpha << 24) | (red << 16) | (green << 8) | blue;
+    private int packRGB(int red, int green, int blue) {
+        return (255 << 24) | (red << 16) | (green << 8) | blue;
     }
 
     public boolean notDoubleClick() {

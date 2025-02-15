@@ -25,6 +25,13 @@
   "quick_chat.config.chat_button.desc": "如果开启，聊天栏内将列出快捷消息列表内的快捷内容，可以通过点击这些快捷按钮来快捷发送消息",
   "quick_chat.config.chat_button.width": "快捷消息按钮宽度",
   "quick_chat.config.chat_button.width.desc": "设置聊天栏内快捷消息按钮的宽度",
+  "quick_chat.config.chat_button.send_mode": "快捷消息按钮发送模式",
+  "quick_chat.config.chat_button.send_mode.click_to_send": "点击即发送",
+  "quick_chat.config.chat_button.send_mode.click_to_send.desc": "点击快捷按钮时，就会立即向聊天栏发送该消息",
+  "quick_chat.config.chat_button.send_mode.paste_to_input": "粘贴至输入框",
+  "quick_chat.config.chat_button.send_mode.paste_to_input.desc": "点击快捷按钮时，将该消息粘贴到输入框中",
+  "quick_chat.config.chat_button.send_mode.replace_input": "覆盖至输入框",
+  "quick_chat.config.chat_button.send_mode.replace_input.desc": "点击快捷按钮时，无论输入框内有什么，一律覆盖为选中的消息",
 
   "quick_chat.gui.message_list.title": "快捷消息列表",
   "quick_chat.gui.message_list.tip_empty": "没有可用的消息，请添加新的消息！",

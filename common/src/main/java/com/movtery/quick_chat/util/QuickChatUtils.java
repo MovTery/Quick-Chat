@@ -14,7 +14,10 @@ import java.util.Date;
 import static com.movtery.quick_chat.QuickChat.getConfig;
 import static com.movtery.quick_chat.config.Config.messageCoolingDurationRange;
 
-public class QuickChatUtils {
+public final class QuickChatUtils {
+    private QuickChatUtils() {
+    }
+
     public static boolean notDoubleClick() {
         LastMessage instance = LastMessage.getInstance();
         long clickTime = Util.getMillis();

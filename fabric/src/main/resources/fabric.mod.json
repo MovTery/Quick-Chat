@@ -15,9 +15,6 @@
   "icon": "icon.png",
   "environment": "client",
   "entrypoints": {
-    "main": [
-      "com.movtery.quick_chat.fabric.QuickChatFabric"
-    ],
     "client": [
       "com.movtery.quick_chat.fabric.client.QuickChatFabricClient"
     ],

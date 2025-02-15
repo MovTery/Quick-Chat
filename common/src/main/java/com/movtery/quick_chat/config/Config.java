@@ -5,12 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.movtery.quick_chat.QuickChat;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Config {
     public static final int[] messageCoolingDurationRange = {1, 15};
@@ -32,19 +29,26 @@ public class Config {
             try {
                 options = GSON.fromJson(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8), Options.class);
                 if (options != null) {
-                    Set<String> invalidValue = new TreeSet<>();
-                    options.message.forEach(v -> {
-                        if (v.length() > 256) invalidValue.add(v);
-                    });
-                    if (!invalidValue.isEmpty()) {
-                        options.message.removeAll(invalidValue);
-                        save();
-                    }
+                    if (options.messageValue != null) {
+                        String messageValue = options.messageValue;
+                        if (messageValue.length() > 256) {
+                            options.messageValue = messageValue.substring(0, 256);
+                        }
+                    } else options.messageValue = "Hello!";
+
+                    List<String> filteredAndDistinct = options.message.stream()
+                            .filter(v -> v.length() <= 256)
+                            .distinct()
+                            .toList();
+
+                    options.message.clear();
+                    options.message.addAll(filteredAndDistinct);
+
+                    save();
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 QuickChat.LOGGER.error("Error loading config");
             }
-
         }
         if (options == null) {
             options = new Options();
@@ -55,7 +59,7 @@ public class Config {
     public void save() {
         try {
             Files.write(file.toPath(), Collections.singleton(GSON.toJson(options)), StandardCharsets.UTF_8);
-        } catch (IOException e) {
+        } catch (Exception e) {
             QuickChat.LOGGER.error("Error saving config");
         }
     }
@@ -67,7 +71,8 @@ public class Config {
         public int chatQuickMessageButtonWidth = 80;
         public boolean messageCoolingDown = true;
         public int messageCoolingDuration = 10;
+        public ButtonMessageSendMode buttonMessageSendMode = ButtonMessageSendMode.CLICK_TO_SEND;
 
-        public TreeSet<String> message = new TreeSet<>();
+        public ArrayList<String> message = new ArrayList<>();
     }
 }

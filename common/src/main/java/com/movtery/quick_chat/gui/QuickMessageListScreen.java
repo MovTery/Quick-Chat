@@ -16,10 +16,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.movtery.quick_chat.QuickChat.getConfig;
@@ -68,7 +65,7 @@ public class QuickMessageListScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         super.render(guiGraphics, mouseX, mouseY, delta);
-        TreeSet<String> message = config.getOptions().message;
+        ArrayList<String> message = config.getOptions().message;
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 16777215);
         guiGraphics.drawCenteredString(this.font,
                 Component.literal(String.format("(%d) ", this.messageListWidget.children().size())).withStyle(ChatFormatting.YELLOW)
@@ -101,7 +98,7 @@ public class QuickMessageListScreen extends Screen {
     private void remove() {
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelected();
         if (messageListEntry != null) {
-            TreeSet<String> message = config.getOptions().message;
+            ArrayList<String> message = config.getOptions().message;
             if (!message.isEmpty()) {
                 message.remove(messageListEntry.message.get(messageListEntry.abbreviatedText));
             }
@@ -129,21 +126,30 @@ public class QuickMessageListScreen extends Screen {
     private class MessageListWidget extends ObjectSelectionList<MessageListWidget.MessageListEntry> {
         public MessageListWidget(Minecraft client) {
             super(client, QuickMessageListScreen.this.width, QuickMessageListScreen.this.height - 93, 32, 18);
-            TreeSet<String> message = config.getOptions().message;
-            if (!message.isEmpty()) {
+            reloadMessages(true);
+        }
+
+        private void reloadMessages(boolean first) {
+            if (!first) this.clearEntries();
+            ArrayList<String> messageList = config.getOptions().message;
+
+            boolean messageIsEmpty = messageList.isEmpty();
+
+            if (!messageIsEmpty) {
                 AtomicInteger i = new AtomicInteger();
-                message.forEach(s -> {
-                    MessageListEntry entry = new MessageListEntry(s);
+                messageList.forEach(message -> {
+                    MessageListEntry entry = new MessageListEntry(this, message, i.get());
                     this.addEntry(entry);
-                    if (i.get() == 0 || Objects.equals(s, LastMessage.getInstance().getLastMessage()))
+                    if (i.get() == 0 || Objects.equals(message, LastMessage.getInstance().getLastMessage())) {
                         this.setSelected(entry);
+                    }
                     i.getAndIncrement();
                 });
-            } else {
-                QuickMessageListScreen.this.removeButton.active = false;
-                QuickMessageListScreen.this.editButton.active = false;
-                QuickMessageListScreen.this.sendButton.active = false;
             }
+
+            QuickMessageListScreen.this.removeButton.active = !messageIsEmpty;
+            QuickMessageListScreen.this.editButton.active = !messageIsEmpty;
+            QuickMessageListScreen.this.sendButton.active = Minecraft.getInstance().player != null && !messageIsEmpty;
         }
 
         @Override
@@ -151,32 +157,73 @@ public class QuickMessageListScreen extends Screen {
             return this.width / 2 + 8;
         }
 
+        public void moveEntryUp(MessageListEntry entry) {
+            int index = entry.index;
+            if (index > 0) {
+                Collections.swap(config.getOptions().message, index, index - 1);
+                config.save();
+                reloadMessages(false);
+            }
+        }
+
+        public void moveEntryDown(MessageListEntry entry) {
+            int index = entry.index;
+            if (index < config.getOptions().message.size() - 1) {
+                Collections.swap(config.getOptions().message, index, index + 1);
+                config.save();
+                reloadMessages(false);
+            }
+        }
+
         public class MessageListEntry extends ObjectSelectionList.Entry<MessageListEntry> {
+            private final MessageListWidget list;
             final Map<String, String> message = new HashMap<>();
             final String abbreviatedText;
             private final WidgetTooltipHolder tooltip = new WidgetTooltipHolder();
             private long clickTime;
+            final int index;
 
-            public MessageListEntry(String message) {
-                this.abbreviatedText = QuickChatUtils.getAbbreviatedText(message, minecraft, QuickMessageListScreen.this.width / 2 - 8);
+            public MessageListEntry(MessageListWidget listWidget, String message, int index) {
+                this.list = listWidget;
+                this.index = index;
+                this.abbreviatedText = QuickChatUtils.getAbbreviatedText(message, minecraft, QuickMessageListScreen.this.width / 2 - 12);
                 this.message.put(this.abbreviatedText, message);
                 this.tooltip.set(Tooltip.create(Component.literal(message)));
             }
 
             @Override
             public void render(GuiGraphics guiGraphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                guiGraphics.drawCenteredString(minecraft.font, this.abbreviatedText, MessageListWidget.this.width / 2, y + 1, 16777215);
+                int textY = y + 2;
+
+                guiGraphics.drawCenteredString(minecraft.font, this.abbreviatedText, MessageListWidget.this.width / 2, textY, 16777215);
+
+                int entryX = list.getRowLeft() + list.getRowWidth();
+
+                guiGraphics.drawString(minecraft.font, "↓", entryX - 11, textY, 16777215);
+                guiGraphics.drawString(minecraft.font, "↑", entryX - 20, textY, 16777215);
+
                 this.tooltip.refreshTooltipForNextRenderPass(this.isMouseOver(mouseX, mouseY), this.isFocused(), this.getRectangle());
             }
 
             public boolean mouseClicked(double mouseX, double mouseY, int button) {
                 this.onPressed();
                 long millis = Util.getMillis();
-                if (Minecraft.getInstance().player != null && millis - this.clickTime < 250L) {
-                    QuickMessageListScreen.this.onDone();
+
+                int entryX = list.getRowLeft() + list.getRowWidth();
+
+                if (mouseX >= entryX - 20 && mouseX <= entryX - 12) {
+                    moveEntryUp(this);
+                    return true;
+                } else if (mouseX >= entryX - 12 && mouseX <= entryX) {
+                    moveEntryDown(this);
+                    return true;
+                } else {
+                    if (Minecraft.getInstance().player != null && millis - this.clickTime < 250L) {
+                        QuickMessageListScreen.this.onDone();
+                    }
+                    this.clickTime = millis;
                 }
 
-                this.clickTime = millis;
                 return true;
             }
 

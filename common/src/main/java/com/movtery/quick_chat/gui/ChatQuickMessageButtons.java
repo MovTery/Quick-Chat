@@ -52,9 +52,7 @@ public class ChatQuickMessageButtons {
 
             buttons.add(new TransparentButton.Builder(Component.literal(QuickChatUtils.getAbbreviatedText(message, this.minecraft, buttonWidth - 6)),
                     button -> listener.onClick((TransparentButton) button, message)).dimensions(location.getX(), this.height - y, buttonWidth, 20)
-                    .tooltip(Tooltip.create(Component.translatable("quick_chat.gui.message_list.send")
-                            .append("\n")
-                            .append(message)))
+                    .tooltip(Tooltip.create(Component.literal(message)))
                     .build());
             location.incrementVerticalSequenceIndex();
         });

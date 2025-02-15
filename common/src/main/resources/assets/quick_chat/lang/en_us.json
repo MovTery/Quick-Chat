@@ -25,6 +25,14 @@
   "quick_chat.config.chat_button.desc": "If enabled, the chat bar will list quick messages, allowing you to send them quickly by clicking these buttons",
   "quick_chat.config.chat_button.width": "Quick Message Button Width",
   "quick_chat.config.chat_button.width.desc": "Set the width of the quick message buttons in the chat bar",
+  "quick_chat.config.chat_button.send_mode": "Quick Chat Button Send Mode",
+  "quick_chat.config.chat_button.send_mode.click_to_send": "Click to Send",
+  "quick_chat.config.chat_button.send_mode.click_to_send.desc": "Clicking the quick chat button will immediately send the message to the chat",
+  "quick_chat.config.chat_button.send_mode.paste_to_input": "Paste to Input",
+  "quick_chat.config.chat_button.send_mode.paste_to_input.desc": "Clicking the quick chat button will paste the message into the input field",
+  "quick_chat.config.chat_button.send_mode.replace_input": "Replace Input",
+  "quick_chat.config.chat_button.send_mode.replace_input.desc": "Clicking the quick chat button will replace whatever is in the input field with the selected message",
+
 
   "quick_chat.gui.message_list.title": "Quick Message List",
   "quick_chat.gui.message_list.tip_empty": "No messages available, please add new messages!",
