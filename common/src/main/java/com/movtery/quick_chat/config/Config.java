@@ -8,6 +8,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Config {
     public static final int[] messageCoolingDurationRange = {1, 15};
@@ -36,13 +37,24 @@ public class Config {
                         }
                     } else options.messageValue = "Hello!";
 
-                    List<String> filteredAndDistinct = options.message.stream()
-                            .filter(v -> v.length() <= 256)
-                            .distinct()
-                            .toList();
+                    if (!options.message.isEmpty()) {
+                        for (String item : options.message) {
+                            options.messageWithComment.put(item, "");
+                        }
+                        options.message.clear();
+                    }
 
-                    options.message.clear();
-                    options.message.addAll(filteredAndDistinct);
+                    options.messageWithComment = options.messageWithComment
+                            .entrySet()
+                            .stream()
+                            .collect(
+                                    Collectors.toMap(
+                                            e -> e.getKey().length() > 256 ? e.getKey().substring(0, 256) : e.getKey(),
+                                            Map.Entry::getValue,
+                                            (oldV, newV) -> oldV,
+                                            LinkedHashMap::new
+                                    )
+                            );
 
                     save();
                 }
@@ -73,6 +85,7 @@ public class Config {
         public int messageCoolingDuration = 10;
         public ButtonMessageSendMode buttonMessageSendMode = ButtonMessageSendMode.CLICK_TO_SEND;
 
-        public ArrayList<String> message = new ArrayList<>();
+        private final ArrayList<String> message = new ArrayList<>();
+        public LinkedHashMap<String, String> messageWithComment = new LinkedHashMap<>();
     }
 }

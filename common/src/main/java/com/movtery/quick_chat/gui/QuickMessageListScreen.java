@@ -3,6 +3,7 @@ package com.movtery.quick_chat.gui;
 import com.movtery.quick_chat.Constants;
 import com.movtery.quick_chat.config.Config;
 import com.movtery.quick_chat.util.LastMessage;
+import com.movtery.quick_chat.util.Pair;
 import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -62,13 +63,12 @@ public class QuickMessageListScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         super.render(guiGraphics, mouseX, mouseY, delta);
-        ArrayList<String> message = config.getOptions().message;
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 16777215);
         guiGraphics.drawCenteredString(this.font,
                 Component.literal(String.format("(%d) ", this.messageListWidget.children().size())).withStyle(ChatFormatting.YELLOW)
-                        .append(message.isEmpty() ?
+                        .append(config.getOptions().messageWithComment.isEmpty() ?
                                 Component.translatable("quick_chat.gui.message_list.tip_empty").withStyle(ChatFormatting.RED) :
                                 Component.translatable("quick_chat.gui.message_list.tip").withStyle(ChatFormatting.WHITE)),
                 this.width / 2, this.height - 54, 16777215);
@@ -88,7 +88,7 @@ public class QuickMessageListScreen extends Screen {
         if (this.minecraft == null) onClose();
 
         if (messageListEntry != null) {
-            QuickChatUtils.sendMessage(this.minecraft, messageListEntry.message.get(messageListEntry.abbreviatedText));
+            QuickChatUtils.sendMessage(this.minecraft, messageListEntry.messageWithComment.get(messageListEntry.abbreviatedText).getKey());
         }
 
         this.onClose();
@@ -97,9 +97,9 @@ public class QuickMessageListScreen extends Screen {
     private void remove() {
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelected();
         if (messageListEntry != null) {
-            ArrayList<String> message = config.getOptions().message;
-            if (!message.isEmpty()) {
-                message.remove(messageListEntry.message.get(messageListEntry.abbreviatedText));
+            LinkedHashMap<String, String> messageWithComment = config.getOptions().messageWithComment;
+            if (!messageWithComment.isEmpty()) {
+                messageWithComment.remove(messageListEntry.messageWithComment.get(messageListEntry.abbreviatedText).getKey());
             }
             config.save();
         }
@@ -118,7 +118,7 @@ public class QuickMessageListScreen extends Screen {
         if (this.minecraft == null) return;
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelected();
         if (messageListEntry != null) {
-            this.minecraft.setScreen(new AddMessageScreen(this, messageListEntry.message.get(messageListEntry.abbreviatedText)));
+            this.minecraft.setScreen(new AddMessageScreen(this, messageListEntry.messageWithComment.get(messageListEntry.abbreviatedText)));
         }
     }
 
@@ -130,14 +130,15 @@ public class QuickMessageListScreen extends Screen {
 
         private void reloadMessages(boolean first) {
             if (!first) this.clearEntries();
-            ArrayList<String> messageList = config.getOptions().message;
+            LinkedHashMap<String, String> messageList = config.getOptions().messageWithComment;
 
             boolean messageIsEmpty = messageList.isEmpty();
 
             if (!messageIsEmpty) {
                 AtomicInteger i = new AtomicInteger();
-                messageList.forEach(message -> {
-                    MessageListEntry entry = new MessageListEntry(this, message, i.get());
+                messageList.forEach((message, comment) -> {
+
+                    MessageListEntry entry = new MessageListEntry(this, new Pair<>(message, comment), i.get());
                     this.addEntry(entry);
                     if (i.get() == 0 || Objects.equals(message, LastMessage.getInstance().getLastMessage())) {
                         this.setSelected(entry);
@@ -159,7 +160,7 @@ public class QuickMessageListScreen extends Screen {
         public void moveEntryUp(MessageListEntry entry) {
             int index = entry.index;
             if (index > 0) {
-                Collections.swap(config.getOptions().message, index, index - 1);
+                config.getOptions().messageWithComment = QuickChatUtils.swapInLinkedHashMap(config.getOptions().messageWithComment, index, index - 1);
                 config.save();
                 reloadMessages(false);
             }
@@ -167,8 +168,8 @@ public class QuickMessageListScreen extends Screen {
 
         public void moveEntryDown(MessageListEntry entry) {
             int index = entry.index;
-            if (index < config.getOptions().message.size() - 1) {
-                Collections.swap(config.getOptions().message, index, index + 1);
+            if (index < config.getOptions().messageWithComment.size() - 1) {
+                config.getOptions().messageWithComment = QuickChatUtils.swapInLinkedHashMap(config.getOptions().messageWithComment, index, index + 1);
                 config.save();
                 reloadMessages(false);
             }
@@ -176,18 +177,18 @@ public class QuickMessageListScreen extends Screen {
 
         public class MessageListEntry extends Entry<MessageListEntry> {
             private final MessageListWidget list;
-            final Map<String, String> message = new HashMap<>();
+            final Map<String, Pair<String, String>> messageWithComment = new HashMap<>();
             final String abbreviatedText;
             private final WidgetTooltipHolder tooltip = new WidgetTooltipHolder();
             private long clickTime;
             final int index;
 
-            public MessageListEntry(MessageListWidget listWidget, String message, int index) {
+            public MessageListEntry(MessageListWidget listWidget, Pair<String, String> messageWithComment, int index) {
                 this.list = listWidget;
                 this.index = index;
-                this.abbreviatedText = QuickChatUtils.getAbbreviatedText(message, minecraft, QuickMessageListScreen.this.width / 2 - 12);
-                this.message.put(this.abbreviatedText, message);
-                this.tooltip.set(Tooltip.create(Component.literal(message)));
+                this.abbreviatedText = QuickChatUtils.getAbbreviatedText(messageWithComment.getKey(), minecraft, QuickMessageListScreen.this.width / 2 - 12);
+                this.messageWithComment.put(this.abbreviatedText, messageWithComment);
+                this.tooltip.set(Tooltip.create(QuickChatUtils.getMessageComponent(messageWithComment)));
             }
 
             @Override
@@ -231,7 +232,7 @@ public class QuickMessageListScreen extends Screen {
             }
 
             public @NotNull Component getNarration() {
-                return Component.literal(this.message.get(abbreviatedText));
+                return QuickChatUtils.getMessageComponent(this.messageWithComment.get(abbreviatedText));
             }
         }
     }

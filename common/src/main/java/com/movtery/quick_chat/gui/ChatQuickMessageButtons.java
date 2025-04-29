@@ -39,7 +39,7 @@ public class ChatQuickMessageButtons {
         int[] widthRange = chatQuickMessageButtonWidthRange;
         int buttonWidth = this.options.chatQuickMessageButtonWidth > widthRange[1] ? widthRange[1] : Math.max(this.options.chatQuickMessageButtonWidth, widthRange[0]);
         ButtonLocation location = new ButtonLocation(width + 18);
-        this.options.message.forEach(message -> {
+        this.options.messageWithComment.forEach((message, comment) -> {
             int y = (20 * location.getColumnIndex()) + 40;
             if (y - 40 > height) {
                 location.addX(buttonWidth);
@@ -52,7 +52,7 @@ public class ChatQuickMessageButtons {
 
             buttons.add(new TransparentButton.Builder(Component.literal(QuickChatUtils.getAbbreviatedText(message, this.minecraft, buttonWidth - 6)),
                     button -> listener.onClick((TransparentButton) button, message)).dimensions(location.getX(), this.height - y, buttonWidth, 20)
-                    .tooltip(Tooltip.create(Component.literal(message)))
+                    .tooltip(Tooltip.create(QuickChatUtils.getMessageComponent(message, comment)))
                     .build());
             location.incrementVerticalSequenceIndex();
         });

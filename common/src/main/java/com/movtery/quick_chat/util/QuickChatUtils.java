@@ -6,11 +6,12 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.*;
 
 import static com.movtery.quick_chat.config.Config.messageCoolingDurationRange;
 
@@ -76,5 +77,31 @@ public final class QuickChatUtils {
             BigDecimal t = bigDecimal.subtract(BigDecimal.valueOf(differ / 1000.0));
             player.displayClientMessage(Component.translatable("quick_chat.in_game.too_often").append(String.format(" %.2fs", t)), true);
         }
+    }
+
+    public static <K, V> LinkedHashMap<K, V> swapInLinkedHashMap(LinkedHashMap<K, V> map, int i, int j) {
+        List<Map.Entry<K, V>> entries = new ArrayList<>(map.entrySet());
+        Collections.swap(entries, i, j);
+        LinkedHashMap<K, V> result = new LinkedHashMap<>(map.size());
+        for (Map.Entry<K, V> entry : entries) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
+    public static Component getMessageComponent(Pair<String, String> messageWithComment) {
+        return getMessageComponent(messageWithComment.getKey(), messageWithComment.getValue());
+    }
+
+    public static Component getMessageComponent(String message, String comment) {
+        MutableComponent component = Component.literal(message).append("\n\n");
+        if (!comment.isEmpty()) {
+            component.append(Component.translatable("quick_chat.config.comment.tooltip"))
+                    .append("\n")
+                    .append(comment);
+        } else {
+            component.append(Component.translatable("quick_chat.config.no_comment.tooltip"));
+        }
+        return component;
     }
 }

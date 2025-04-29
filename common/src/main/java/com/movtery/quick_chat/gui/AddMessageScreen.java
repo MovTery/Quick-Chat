@@ -2,6 +2,7 @@ package com.movtery.quick_chat.gui;
 
 import com.movtery.quick_chat.Constants;
 import com.movtery.quick_chat.config.Config;
+import com.movtery.quick_chat.util.Pair;
 import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -14,22 +15,25 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedHashMap;
+
 public class AddMessageScreen extends Screen {
     private final Screen parent;
-    private final String message;
+    private final Pair<String, String> messageWithComment;
     private EditBox messageField;
+    private EditBox commentField;
     private CommandSuggestions commandSuggestions;
 
     public AddMessageScreen(Screen parent) {
         super(Component.translatable("quick_chat.gui.add_message.title"));
         this.parent = parent;
-        this.message = null;
+        this.messageWithComment = null;
     }
 
-    public AddMessageScreen(Screen parent, String message) {
+    public AddMessageScreen(Screen parent, Pair<String, String> messageWithComment) {
         super(Component.translatable("quick_chat.gui.add_message.title"));
         this.parent = parent;
-        this.message = message;
+        this.messageWithComment = messageWithComment;
     }
 
     @Override
@@ -45,9 +49,21 @@ public class AddMessageScreen extends Screen {
 
         this.messageField.setMaxLength(256);
         this.messageField.setResponder(s -> updateCommandInfo());
-        this.messageField.setValue(this.message == null ? "" : this.message);
+        this.messageField.setValue(this.messageWithComment == null ? "" : this.messageWithComment.getKey());
+
+        this.commentField = new EditBox(this.font, this.width / 2 - 150, this.height - 100, 300, 20, Component.translatable("quick_chat.config.comment")) {
+            @Override
+            protected @NotNull MutableComponent createNarrationMessage() {
+                return super.createNarrationMessage();
+            }
+        };
+
+        this.commentField.setMaxLength(Integer.MAX_VALUE);
+        this.commentField.setValue(this.messageWithComment == null ? "" : this.messageWithComment.getValue());
 
         this.addWidget(this.messageField);
+        this.addWidget(this.commentField);
+
         this.setInitialFocus(this.messageField);
 
         updateCommandInfo();
@@ -71,6 +87,10 @@ public class AddMessageScreen extends Screen {
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.messageField.render(guiGraphics, mouseX, mouseY, delta);
+
+        guiGraphics.drawWordWrap(this.font, Component.translatable("quick_chat.config.comment"), this.width / 2 - 150, this.height - 110, 500, 16777215);
+        this.commentField.render(guiGraphics, mouseX, mouseY, delta);
+
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 16777215);
         guiGraphics.drawWordWrap(this.font, Component.translatable("quick_chat.config.message.desc"), this.width / 2 - 150, this.height - 70, 500, 16777215);
 
@@ -80,8 +100,10 @@ public class AddMessageScreen extends Screen {
     @Override
     public void resize(@NotNull Minecraft minecraft, int width, int height) {
         String message = this.messageField.getValue();
+        String comment = this.commentField.getValue();
         this.init(minecraft, width, height);
         this.messageField.setValue(message);
+        this.commentField.setValue(comment);
         updateCommandInfo();
     }
 
@@ -117,12 +139,14 @@ public class AddMessageScreen extends Screen {
 
     private void addMessage() {
         String message = this.messageField.getValue();
+        String comment = this.commentField.getValue();
         Config config = Constants.getConfig();
-        if (!message.isEmpty() && !config.getOptions().message.contains(message)) {
-            if (this.message != null) {
-                config.getOptions().message.remove(this.message);
+        LinkedHashMap<String, String> messageWithComment = config.getOptions().messageWithComment;
+        if (!message.isEmpty() && !(messageWithComment.containsKey(message) && messageWithComment.get(message).equals(message))) {
+            if (this.messageWithComment != null) {
+                messageWithComment.remove(this.messageWithComment.getKey());
             }
-            config.getOptions().message.add(message);
+            messageWithComment.put(message, comment);
             config.save();
         }
 

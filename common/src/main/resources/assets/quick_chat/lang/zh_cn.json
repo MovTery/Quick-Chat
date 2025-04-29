@@ -32,6 +32,9 @@
   "quick_chat.config.chat_button.send_mode.paste_to_input.desc": "点击快捷按钮时，将该消息粘贴到输入框中",
   "quick_chat.config.chat_button.send_mode.replace_input": "覆盖至输入框",
   "quick_chat.config.chat_button.send_mode.replace_input.desc": "点击快捷按钮时，无论输入框内有什么，一律覆盖为选中的消息",
+  "quick_chat.config.comment": "备注内容",
+  "quick_chat.config.comment.tooltip": "备注：",
+  "quick_chat.config.no_comment.tooltip": "没有备注信息",
 
   "quick_chat.gui.message_list.title": "快捷消息列表",
   "quick_chat.gui.message_list.tip_empty": "没有可用的消息，请添加新的消息！",

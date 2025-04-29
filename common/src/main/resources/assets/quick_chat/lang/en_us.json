@@ -32,7 +32,9 @@
   "quick_chat.config.chat_button.send_mode.paste_to_input.desc": "Clicking the quick chat button will paste the message into the input field",
   "quick_chat.config.chat_button.send_mode.replace_input": "Replace Input",
   "quick_chat.config.chat_button.send_mode.replace_input.desc": "Clicking the quick chat button will replace whatever is in the input field with the selected message",
-
+  "quick_chat.config.comment": "Comment content",
+  "quick_chat.config.comment.tooltip": "Comment:",
+  "quick_chat.config.no_comment.tooltip": "No comment information",
 
   "quick_chat.gui.message_list.title": "Quick Message List",
   "quick_chat.gui.message_list.tip_empty": "No messages available, please add new messages!",
