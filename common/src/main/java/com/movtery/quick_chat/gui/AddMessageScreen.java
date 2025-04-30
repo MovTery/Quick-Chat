@@ -140,7 +140,7 @@ public class AddMessageScreen extends Screen {
         String comment = this.commentField.getValue();
         Config config = Constants.getConfig();
         ArrayList<Message> messageWithComment = config.getOptions().messageWithComment;
-        if (!message.isEmpty() && !comment.isEmpty()) {
+        if (!message.isEmpty()) {
             Optional<Message> optional = messageWithComment.stream()
                     .filter(m -> m.equals(this.messageObject))
                     .findFirst();
