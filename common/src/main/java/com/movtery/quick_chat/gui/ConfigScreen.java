@@ -70,7 +70,6 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.messageField.render(guiGraphics, mouseX, mouseY, delta);
 
@@ -104,8 +103,8 @@ public class ConfigScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        return this.commandSuggestions.mouseScrolled(delta) || super.mouseScrolled(mouseX, mouseY, delta);
+    public boolean mouseScrolled(double d, double e, double f, double g) {
+        return this.commandSuggestions.mouseScrolled(g) || super.mouseScrolled(d, e, f, g);
     }
 
     @Override

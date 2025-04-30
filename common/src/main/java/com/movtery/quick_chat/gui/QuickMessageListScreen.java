@@ -64,7 +64,6 @@ public class QuickMessageListScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 16777215);
         guiGraphics.drawCenteredString(this.font,
@@ -125,7 +124,7 @@ public class QuickMessageListScreen extends Screen {
 
     private class MessageListWidget extends ObjectSelectionList<MessageListWidget.MessageListEntry> {
         public MessageListWidget(Minecraft client) {
-            super(client, QuickMessageListScreen.this.width, QuickMessageListScreen.this.height - 93, 32, QuickMessageListScreen.this.height - 65 + 4, 18);
+            super(client, QuickMessageListScreen.this.width, QuickMessageListScreen.this.height - 93, 32, 18);
             reloadMessages(true);
         }
 
