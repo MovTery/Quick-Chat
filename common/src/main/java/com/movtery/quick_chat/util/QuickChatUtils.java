@@ -2,6 +2,7 @@ package com.movtery.quick_chat.util;
 
 import com.movtery.quick_chat.Constants;
 import com.movtery.quick_chat.config.Config;
+import com.movtery.quick_chat.config.Message;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
 
 import static com.movtery.quick_chat.config.Config.messageCoolingDurationRange;
 
@@ -79,18 +80,8 @@ public final class QuickChatUtils {
         }
     }
 
-    public static <K, V> LinkedHashMap<K, V> swapInLinkedHashMap(LinkedHashMap<K, V> map, int i, int j) {
-        List<Map.Entry<K, V>> entries = new ArrayList<>(map.entrySet());
-        Collections.swap(entries, i, j);
-        LinkedHashMap<K, V> result = new LinkedHashMap<>(map.size());
-        for (Map.Entry<K, V> entry : entries) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-        return result;
-    }
-
-    public static Component getMessageComponent(Pair<String, String> messageWithComment) {
-        return getMessageComponent(messageWithComment.getKey(), messageWithComment.getValue());
+    public static Component getMessageComponent(Message messageObject) {
+        return getMessageComponent(messageObject.getMessage(), messageObject.getComment());
     }
 
     public static Component getMessageComponent(String message, String comment) {

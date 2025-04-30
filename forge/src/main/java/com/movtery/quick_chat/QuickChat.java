@@ -25,19 +25,21 @@ public final class QuickChat {
     }
 
     @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent.Post event) {
-        while (ModKeyMappings.ONE_CLICK.get().consumeClick()) {
-            //开启防误触设置之后，将启用双击检测
-            if (Constants.getConfig().getOptions().antiFalseContact && QuickChatUtils.notDoubleClick()) break;
-            QuickChatUtils.sendMessage(Minecraft.getInstance());
-        }
-        while (ModKeyMappings.QUICK_MESSAGE.get().consumeClick()) {
-            Minecraft minecraft = Minecraft.getInstance();
-            minecraft.setScreen(new QuickMessageListScreen(minecraft.screen));
-        }
-        while (ModKeyMappings.CONFIG.get().consumeClick()) {
-            Minecraft minecraft = Minecraft.getInstance();
-            minecraft.setScreen(new ConfigScreen(minecraft.screen));
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            while (ModKeyMappings.ONE_CLICK.get().consumeClick()) {
+                //开启防误触设置之后，将启用双击检测
+                if (Constants.getConfig().getOptions().antiFalseContact && QuickChatUtils.notDoubleClick()) break;
+                QuickChatUtils.sendMessage(Minecraft.getInstance());
+            }
+            while (ModKeyMappings.QUICK_MESSAGE.get().consumeClick()) {
+                Minecraft minecraft = Minecraft.getInstance();
+                minecraft.setScreen(new QuickMessageListScreen(minecraft.screen));
+            }
+            while (ModKeyMappings.CONFIG.get().consumeClick()) {
+                Minecraft minecraft = Minecraft.getInstance();
+                minecraft.setScreen(new ConfigScreen(minecraft.screen));
+            }
         }
     }
 

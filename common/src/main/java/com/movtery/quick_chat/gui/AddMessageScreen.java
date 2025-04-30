@@ -2,7 +2,7 @@ package com.movtery.quick_chat.gui;
 
 import com.movtery.quick_chat.Constants;
 import com.movtery.quick_chat.config.Config;
-import com.movtery.quick_chat.util.Pair;
+import com.movtery.quick_chat.config.Message;
 import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -15,11 +15,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.Optional;
 
 public class AddMessageScreen extends Screen {
     private final Screen parent;
-    private final Pair<String, String> messageWithComment;
+    private final Message messageObject;
     private EditBox messageField;
     private EditBox commentField;
     private CommandSuggestions commandSuggestions;
@@ -27,13 +28,13 @@ public class AddMessageScreen extends Screen {
     public AddMessageScreen(Screen parent) {
         super(Component.translatable("quick_chat.gui.add_message.title"));
         this.parent = parent;
-        this.messageWithComment = null;
+        this.messageObject = null;
     }
 
-    public AddMessageScreen(Screen parent, Pair<String, String> messageWithComment) {
+    public AddMessageScreen(Screen parent, Message messageObject) {
         super(Component.translatable("quick_chat.gui.add_message.title"));
         this.parent = parent;
-        this.messageWithComment = messageWithComment;
+        this.messageObject = messageObject;
     }
 
     @Override
@@ -49,7 +50,7 @@ public class AddMessageScreen extends Screen {
 
         this.messageField.setMaxLength(256);
         this.messageField.setResponder(s -> updateCommandInfo());
-        this.messageField.setValue(this.messageWithComment == null ? "" : this.messageWithComment.getKey());
+        this.messageField.setValue(this.messageObject == null ? "" : this.messageObject.getMessage());
 
         this.commentField = new EditBox(this.font, this.width / 2 - 150, this.height - 100, 300, 20, Component.translatable("quick_chat.config.comment")) {
             @Override
@@ -59,7 +60,7 @@ public class AddMessageScreen extends Screen {
         };
 
         this.commentField.setMaxLength(Integer.MAX_VALUE);
-        this.commentField.setValue(this.messageWithComment == null ? "" : this.messageWithComment.getValue());
+        this.commentField.setValue(this.messageObject == null ? "" : this.messageObject.getComment());
 
         this.addWidget(this.messageField);
         this.addWidget(this.commentField);
@@ -73,11 +74,6 @@ public class AddMessageScreen extends Screen {
     }
 
     @Override
-    protected @NotNull Component getUsageNarration() {
-        return this.commandSuggestions.isVisible() ? this.commandSuggestions.getUsageNarration() : super.getUsageNarration();
-    }
-
-    @Override
     public void onClose() {
         if (this.minecraft == null) return;
         this.minecraft.setScreen(this.parent);
@@ -85,6 +81,8 @@ public class AddMessageScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        this.renderBackground(guiGraphics);
+
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.messageField.render(guiGraphics, mouseX, mouseY, delta);
 
@@ -122,8 +120,8 @@ public class AddMessageScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f, double g) {
-        return this.commandSuggestions.mouseScrolled(g) || super.mouseScrolled(d, e, f, g);
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        return this.commandSuggestions.mouseScrolled(delta) || super.mouseScrolled(mouseX, mouseY, delta);
     }
 
     @Override
@@ -141,12 +139,19 @@ public class AddMessageScreen extends Screen {
         String message = this.messageField.getValue();
         String comment = this.commentField.getValue();
         Config config = Constants.getConfig();
-        LinkedHashMap<String, String> messageWithComment = config.getOptions().messageWithComment;
-        if (!message.isEmpty() && !(messageWithComment.containsKey(message) && messageWithComment.get(message).equals(message))) {
-            if (this.messageWithComment != null) {
-                messageWithComment.remove(this.messageWithComment.getKey());
+        ArrayList<Message> messageWithComment = config.getOptions().messageWithComment;
+        if (!message.isEmpty() && !comment.isEmpty()) {
+            Optional<Message> optional = messageWithComment.stream()
+                    .filter(m -> m.equals(this.messageObject))
+                    .findFirst();
+
+            if (optional.isPresent()) {
+                Message originObject = optional.get();
+                originObject.setMessage(message);
+                originObject.setComment(comment);
+            } else {
+                messageWithComment.add(new Message(message, comment));
             }
-            messageWithComment.put(message, comment);
             config.save();
         }
 

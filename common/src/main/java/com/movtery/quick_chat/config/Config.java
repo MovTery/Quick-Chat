@@ -2,19 +2,25 @@ package com.movtery.quick_chat.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 import com.movtery.quick_chat.Constants;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Config {
     public static final int[] messageCoolingDurationRange = {1, 15};
     public static final int[] chatQuickMessageButtonWidthRange = {60, 200};
     private final File file;
-    private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private final Gson GSON = new GsonBuilder()
+            .setPrettyPrinting()
+            .excludeFieldsWithoutExposeAnnotation()
+            .create();
+
     private Options options = null;
 
     public Config(File file) {
@@ -39,23 +45,18 @@ public class Config {
 
                     if (!options.message.isEmpty()) {
                         for (String item : options.message) {
-                            options.messageWithComment.put(item, "");
+                            options.messageWithComment.add(new Message(item, ""));
                         }
                         options.message.clear();
                     }
 
-                    options.messageWithComment = options.messageWithComment
-                            .entrySet()
-                            .stream()
-                            .collect(
-                                    Collectors.toMap(
-                                            e -> e.getKey().length() > 256 ? e.getKey().substring(0, 256) : e.getKey(),
-                                            Map.Entry::getValue,
-                                            (oldV, newV) -> oldV,
-                                            LinkedHashMap::new
-                                    )
-                            );
+                    List<Message> filteredAndDistinct = options.messageWithComment.stream()
+                            .filter(message -> message.getMessage().length() <= 256)
+                            .distinct()
+                            .toList();
 
+                    options.messageWithComment.clear();
+                    options.messageWithComment.addAll(filteredAndDistinct);
                     save();
                 }
             } catch (Exception e) {
@@ -77,15 +78,17 @@ public class Config {
     }
 
     public static class Options {
-        public String messageValue = "Hello!";
-        public boolean antiFalseContact = false;
-        public boolean chatQuickMessageButton = true;
-        public int chatQuickMessageButtonWidth = 80;
-        public boolean messageCoolingDown = true;
-        public int messageCoolingDuration = 10;
-        public ButtonMessageSendMode buttonMessageSendMode = ButtonMessageSendMode.CLICK_TO_SEND;
+        @Expose public String messageValue = "Hello!";
+        @Expose public boolean antiFalseContact = false;
+        @Expose public boolean chatQuickMessageButton = true;
+        @Expose public int chatQuickMessageButtonWidth = 80;
+        @Expose public boolean messageCoolingDown = true;
+        @Expose public int messageCoolingDuration = 10;
+        @Expose public ButtonMessageSendMode buttonMessageSendMode = ButtonMessageSendMode.CLICK_TO_SEND;
 
+        @Expose(serialize = false)
         private final ArrayList<String> message = new ArrayList<>();
-        public LinkedHashMap<String, String> messageWithComment = new LinkedHashMap<>();
+
+        @Expose public ArrayList<Message> messageWithComment = new ArrayList<>();
     }
 }

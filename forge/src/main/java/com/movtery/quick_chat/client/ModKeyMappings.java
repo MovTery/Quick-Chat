@@ -1,7 +1,7 @@
 package com.movtery.quick_chat.client;
 
-import cpw.mods.util.Lazy;
 import net.minecraft.client.KeyMapping;
+import net.minecraftforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 
 public class ModKeyMappings {

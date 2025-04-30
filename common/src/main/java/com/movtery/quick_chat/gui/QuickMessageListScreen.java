@@ -2,8 +2,8 @@ package com.movtery.quick_chat.gui;
 
 import com.movtery.quick_chat.Constants;
 import com.movtery.quick_chat.config.Config;
+import com.movtery.quick_chat.config.Message;
 import com.movtery.quick_chat.util.LastMessage;
-import com.movtery.quick_chat.util.Pair;
 import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -12,8 +12,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +64,7 @@ public class QuickMessageListScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 16777215);
         guiGraphics.drawCenteredString(this.font,
@@ -88,7 +89,7 @@ public class QuickMessageListScreen extends Screen {
         if (this.minecraft == null) onClose();
 
         if (messageListEntry != null) {
-            QuickChatUtils.sendMessage(this.minecraft, messageListEntry.messageWithComment.get(messageListEntry.abbreviatedText).getKey());
+            QuickChatUtils.sendMessage(this.minecraft, messageListEntry.messageWithComment.get(messageListEntry.abbreviatedText).getMessage());
         }
 
         this.onClose();
@@ -97,9 +98,9 @@ public class QuickMessageListScreen extends Screen {
     private void remove() {
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelected();
         if (messageListEntry != null) {
-            LinkedHashMap<String, String> messageWithComment = config.getOptions().messageWithComment;
+            ArrayList<Message> messageWithComment = config.getOptions().messageWithComment;
             if (!messageWithComment.isEmpty()) {
-                messageWithComment.remove(messageListEntry.messageWithComment.get(messageListEntry.abbreviatedText).getKey());
+                messageWithComment.remove(messageListEntry.messageWithComment.get(messageListEntry.abbreviatedText));
             }
             config.save();
         }
@@ -124,23 +125,23 @@ public class QuickMessageListScreen extends Screen {
 
     private class MessageListWidget extends ObjectSelectionList<MessageListWidget.MessageListEntry> {
         public MessageListWidget(Minecraft client) {
-            super(client, QuickMessageListScreen.this.width, QuickMessageListScreen.this.height - 93, 32, 18);
+            super(client, QuickMessageListScreen.this.width, QuickMessageListScreen.this.height - 93, 32, QuickMessageListScreen.this.height - 65 + 4, 18);
             reloadMessages(true);
         }
 
         private void reloadMessages(boolean first) {
             if (!first) this.clearEntries();
-            LinkedHashMap<String, String> messageList = config.getOptions().messageWithComment;
+            ArrayList<Message> messageList = config.getOptions().messageWithComment;
 
             boolean messageIsEmpty = messageList.isEmpty();
 
             if (!messageIsEmpty) {
                 AtomicInteger i = new AtomicInteger();
-                messageList.forEach((message, comment) -> {
+                messageList.forEach(message -> {
 
-                    MessageListEntry entry = new MessageListEntry(this, new Pair<>(message, comment), i.get());
+                    MessageListEntry entry = new MessageListEntry(this, message, i.get());
                     this.addEntry(entry);
-                    if (i.get() == 0 || Objects.equals(message, LastMessage.getInstance().getLastMessage())) {
+                    if (i.get() == 0 || Objects.equals(message.getMessage(), LastMessage.getInstance().getLastMessage())) {
                         this.setSelected(entry);
                     }
                     i.getAndIncrement();
@@ -152,43 +153,41 @@ public class QuickMessageListScreen extends Screen {
             QuickMessageListScreen.this.sendButton.active = Minecraft.getInstance().player != null && !messageIsEmpty;
         }
 
-        @Override
-        public int getRowWidth() {
-            return this.width / 2 + 8;
-        }
-
         public void moveEntryUp(MessageListEntry entry) {
             int index = entry.index;
             if (index > 0) {
-                config.getOptions().messageWithComment = QuickChatUtils.swapInLinkedHashMap(config.getOptions().messageWithComment, index, index - 1);
-                config.save();
-                reloadMessages(false);
+                moveEntry(index, index - 1);
             }
         }
 
         public void moveEntryDown(MessageListEntry entry) {
             int index = entry.index;
             if (index < config.getOptions().messageWithComment.size() - 1) {
-                config.getOptions().messageWithComment = QuickChatUtils.swapInLinkedHashMap(config.getOptions().messageWithComment, index, index + 1);
-                config.save();
-                reloadMessages(false);
+                moveEntry(index, index + 1);
             }
+        }
+
+        private void moveEntry(int index1, int index2) {
+            ArrayList<Message> messageWithComment = config.getOptions().messageWithComment;
+            Collections.swap(messageWithComment, index1, index2);
+            config.save();
+            reloadMessages(false);
         }
 
         public class MessageListEntry extends Entry<MessageListEntry> {
             private final MessageListWidget list;
-            final Map<String, Pair<String, String>> messageWithComment = new HashMap<>();
+            final Map<String, Message> messageWithComment = new HashMap<>();
             final String abbreviatedText;
-            private final WidgetTooltipHolder tooltip = new WidgetTooltipHolder();
+            private final Tooltip tooltip;
             private long clickTime;
             final int index;
 
-            public MessageListEntry(MessageListWidget listWidget, Pair<String, String> messageWithComment, int index) {
+            public MessageListEntry(MessageListWidget listWidget, Message messageObject, int index) {
                 this.list = listWidget;
                 this.index = index;
-                this.abbreviatedText = QuickChatUtils.getAbbreviatedText(messageWithComment.getKey(), minecraft, QuickMessageListScreen.this.width / 2 - 12);
-                this.messageWithComment.put(this.abbreviatedText, messageWithComment);
-                this.tooltip.set(Tooltip.create(QuickChatUtils.getMessageComponent(messageWithComment)));
+                this.abbreviatedText = QuickChatUtils.getAbbreviatedText(messageObject.getMessage(), minecraft, list.getRowWidth() - 30);
+                this.messageWithComment.put(this.abbreviatedText, messageObject);
+                this.tooltip = Tooltip.create(QuickChatUtils.getMessageComponent(messageObject));
             }
 
             @Override
@@ -202,7 +201,10 @@ public class QuickMessageListScreen extends Screen {
                 guiGraphics.drawString(minecraft.font, "↓", entryX - 11, textY, 16777215);
                 guiGraphics.drawString(minecraft.font, "↑", entryX - 20, textY, 16777215);
 
-                this.tooltip.refreshTooltipForNextRenderPass(this.isMouseOver(mouseX, mouseY), this.isFocused(), this.getRectangle());
+                if (this.isMouseOver(mouseX, mouseY)) {
+                    Screen screen = Minecraft.getInstance().screen;
+                    if (screen != null) screen.setTooltipForNextRenderPass(this.tooltip, DefaultTooltipPositioner.INSTANCE, this.isFocused());
+                }
             }
 
             public boolean mouseClicked(double mouseX, double mouseY, int button) {

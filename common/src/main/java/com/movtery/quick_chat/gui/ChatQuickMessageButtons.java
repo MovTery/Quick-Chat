@@ -39,7 +39,7 @@ public class ChatQuickMessageButtons {
         int[] widthRange = chatQuickMessageButtonWidthRange;
         int buttonWidth = this.options.chatQuickMessageButtonWidth > widthRange[1] ? widthRange[1] : Math.max(this.options.chatQuickMessageButtonWidth, widthRange[0]);
         ButtonLocation location = new ButtonLocation(width + 18);
-        this.options.messageWithComment.forEach((message, comment) -> {
+        this.options.messageWithComment.forEach(messageObject -> {
             int y = (20 * location.getColumnIndex()) + 40;
             if (y - 40 > height) {
                 location.addX(buttonWidth);
@@ -49,6 +49,9 @@ public class ChatQuickMessageButtons {
             if (location.getX() + buttonWidth > this.width) {
                 return;
             } //防止超出屏幕宽度
+
+            String message = messageObject.getMessage();
+            String comment = messageObject.getComment();
 
             buttons.add(new TransparentButton.Builder(Component.literal(QuickChatUtils.getAbbreviatedText(message, this.minecraft, buttonWidth - 6)),
                     button -> listener.onClick((TransparentButton) button, message)).dimensions(location.getX(), this.height - y, buttonWidth, 20)
