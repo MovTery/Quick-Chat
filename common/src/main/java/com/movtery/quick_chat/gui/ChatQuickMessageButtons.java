@@ -11,8 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-import static com.movtery.quick_chat.config.Config.chatQuickMessageButtonWidthRange;
-
 public class ChatQuickMessageButtons {
     private final Minecraft minecraft;
     private final int width, height;
@@ -36,15 +34,15 @@ public class ChatQuickMessageButtons {
     }
 
     private void addButton(@NotNull ButtonClickListener listener, int width, int height, ArrayList<TransparentButton> buttons) {
-        int[] widthRange = chatQuickMessageButtonWidthRange;
-        int buttonWidth = this.options.chatQuickMessageButtonWidth > widthRange[1] ? widthRange[1] : Math.max(this.options.chatQuickMessageButtonWidth, widthRange[0]);
+        int buttonWidth = this.options.getChatButtonWidth();
+        int buttonHeight = this.options.getChatButtonHeight();
         ButtonLocation location = new ButtonLocation(width + 18);
         this.options.messageWithComment.forEach(messageObject -> {
-            int y = (20 * location.getColumnIndex()) + 40;
+            int y = (buttonHeight * location.getColumnIndex()) + 40;
             if (y - 40 > height) {
                 location.addX(buttonWidth);
                 location.resetColumnIndex();
-                y = (20 * location.getColumnIndex()) + 40;
+                y = (buttonHeight * location.getColumnIndex()) + 40;
             } //防止按钮超出聊天栏高度
             if (location.getX() + buttonWidth > this.width) {
                 return;
@@ -53,8 +51,15 @@ public class ChatQuickMessageButtons {
             String message = messageObject.getMessage();
             String comment = messageObject.getComment();
 
-            buttons.add(new TransparentButton.Builder(Component.literal(QuickChatUtils.getAbbreviatedText(message, this.minecraft, buttonWidth - 6)),
-                    button -> listener.onClick((TransparentButton) button, message)).dimensions(location.getX(), this.height - y, buttonWidth, 20)
+            String showOnButton;
+            if (options.displayAsComment && !comment.isEmpty()) {
+                showOnButton = comment;
+            } else {
+                showOnButton = message;
+            }
+
+            buttons.add(new TransparentButton.Builder(Component.literal(QuickChatUtils.getAbbreviatedText(showOnButton, this.minecraft, buttonWidth - 6)),
+                    button -> listener.onClick((TransparentButton) button, message)).dimensions(location.getX(), this.height - y, buttonWidth, buttonHeight)
                     .tooltip(Tooltip.create(QuickChatUtils.getMessageComponent(message, comment)))
                     .build());
             location.incrementVerticalSequenceIndex();
