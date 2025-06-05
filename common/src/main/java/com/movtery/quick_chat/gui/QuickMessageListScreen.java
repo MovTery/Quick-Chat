@@ -185,7 +185,13 @@ public class QuickMessageListScreen extends Screen {
             public MessageListEntry(MessageListWidget listWidget, Message messageObject, int index) {
                 this.list = listWidget;
                 this.index = index;
-                this.abbreviatedText = QuickChatUtils.getAbbreviatedText(messageObject.getMessage(), minecraft, list.getRowWidth() - 30);
+                String showOnEntry;
+                if (config.getOptions().displayAsComment && !messageObject.getComment().isEmpty()) {
+                    showOnEntry = messageObject.getComment();
+                } else {
+                    showOnEntry = messageObject.getMessage();
+                }
+                this.abbreviatedText = QuickChatUtils.getAbbreviatedText(showOnEntry, minecraft, list.getRowWidth() - 30);
                 this.messageWithComment.put(this.abbreviatedText, messageObject);
                 this.tooltip = Tooltip.create(QuickChatUtils.getMessageComponent(messageObject));
             }

@@ -32,8 +32,9 @@ public class TransparentButton extends Button {
 
         guiGraphics.fill(this.getX(), this.getY() + this.getHeight(), this.getX() + this.getWidth(), this.getY(), color);
 
-        int textColor = this.active ? 16777215 : 10526880;
-        this.renderString(guiGraphics, minecraft.font, textColor | Mth.ceil(this.alpha * 255.0F) << 24);
+        int textColor = (this.active ? 16777215 : 10526880) | Mth.ceil(this.alpha * 255.0F) << 24;
+        int textY = this.getY() + (this.getHeight() - minecraft.font.lineHeight) / 2 + 1; //自适应纵向居中 (+1 为视觉偏移)
+        guiGraphics.drawString(minecraft.font, this.getMessage(), this.getX() + 4, textY, textColor);
     }
 
     private int packARGB(int alpha, int red, int green, int blue) {

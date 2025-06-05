@@ -13,8 +13,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class Config {
-    public static final int[] messageCoolingDurationRange = {1, 15};
-    public static final int[] chatQuickMessageButtonWidthRange = {60, 200};
     private final File file;
     private final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
@@ -57,6 +55,22 @@ public class Config {
 
                     options.messageWithComment.clear();
                     options.messageWithComment.addAll(filteredAndDistinct);
+
+                    int buttonWidth = options.getChatButtonWidth();
+                    if (options.chatQuickMessageButtonWidth != buttonWidth) {
+                        options.chatQuickMessageButtonWidth = buttonWidth;
+                    }
+
+                    int buttonHeight = options.getChatButtonHeight();
+                    if (options.chatQuickMessageButtonHeight != buttonHeight) {
+                        options.chatQuickMessageButtonHeight = buttonHeight;
+                    }
+
+                    int coolingDuration = options.getCoolingDuration();
+                    if (options.messageCoolingDuration != coolingDuration) {
+                        options.messageCoolingDuration = coolingDuration;
+                    }
+
                     save();
                 }
             } catch (Exception e) {
@@ -84,11 +98,28 @@ public class Config {
         @Expose public int chatQuickMessageButtonWidth = 80;
         @Expose public boolean messageCoolingDown = true;
         @Expose public int messageCoolingDuration = 10;
+        @Expose public boolean displayAsComment = false;
+        @Expose public int chatQuickMessageButtonHeight = 20;
         @Expose public ButtonMessageSendMode buttonMessageSendMode = ButtonMessageSendMode.CLICK_TO_SEND;
 
         @Expose(serialize = false)
         private final ArrayList<String> message = new ArrayList<>();
 
         @Expose public ArrayList<Message> messageWithComment = new ArrayList<>();
+
+        public int getChatButtonWidth() {
+            int[] widthRange = {60, 200};
+            return this.chatQuickMessageButtonWidth > widthRange[1] ? widthRange[1] : Math.max(this.chatQuickMessageButtonWidth, widthRange[0]);
+        }
+
+        public int getChatButtonHeight() {
+            int[] heightRange = {10, 30};
+            return this.chatQuickMessageButtonHeight > heightRange[1] ? heightRange[1] : Math.max(this.chatQuickMessageButtonHeight, heightRange[0]);
+        }
+
+        public int getCoolingDuration() {
+            int[] durationRange = {1, 15};
+            return this.messageCoolingDuration > durationRange[1] ? durationRange[1] : Math.max(this.messageCoolingDuration, durationRange[0]);
+        }
     }
 }

@@ -27,8 +27,8 @@ public class ConfigScreen extends Screen {
     private EditBox messageField;
     private Button messageListButton;
     private CycleButton<ButtonMessageSendMode> messageSendModeButton;
-    private CycleButton<Boolean> antiFalseContactButton, chatQuickMessageButton, messageCoolingDownButton;
-    private AbstractWidget cooldownDurationButton, chatQuickMessageButtonWidth;
+    private CycleButton<Boolean> antiFalseContactButton, displayAsComment, chatQuickMessageButton, messageCoolingDownButton;
+    private AbstractWidget chatQuickMessageButtonHeight, cooldownDurationButton, chatQuickMessageButtonWidth;
     private CommandSuggestions commandSuggestions;
 
     public ConfigScreen(Screen parent) {
@@ -55,6 +55,8 @@ public class ConfigScreen extends Screen {
         this.addRenderableWidget(this.antiFalseContactButton);
         this.addRenderableWidget(this.messageListButton);
         this.addRenderableWidget(this.messageSendModeButton);
+        this.addRenderableWidget(this.displayAsComment);
+        this.addRenderableWidget(this.chatQuickMessageButtonHeight);
         this.addRenderableWidget(this.chatQuickMessageButton);
         this.addRenderableWidget(this.chatQuickMessageButtonWidth);
         this.addRenderableWidget(this.messageCoolingDownButton);
@@ -138,11 +140,15 @@ public class ConfigScreen extends Screen {
         });
         this.messageField.setValue(this.textEmpty ? "" : this.options.messageValue);
 
+        int i1 = -2;
+        int baseHeight = this.height / 2 + 8;
+        int heightOffset = 26;
+
         //防误触
         this.antiFalseContactButton = getCyclingButtonWidget(this.options.antiFalseContact,
                 "quick_chat.config.anti_false_contact",
                 "quick_chat.config.anti_false_contact.desc",
-                this.width / 2 - 150, this.height / 2 - 26,
+                this.width / 2 - 150, baseHeight + (heightOffset * i1),
                 (button, value) -> {
                     this.options.antiFalseContact = value;
                     this.config.save();
@@ -154,8 +160,10 @@ public class ConfigScreen extends Screen {
 
                     if (saveText(this.minecraft)) this.minecraft.setScreen(new QuickMessageListScreen(this));
                 }).tooltip(Tooltip.create(Component.translatable("quick_chat.config.message_list.desc")))
-                .bounds(this.width / 2 + 2, this.height / 2 - 26, 148, 20)
+                .bounds(this.width / 2 + 2, baseHeight + (heightOffset * i1), 148, 20)
                 .build();
+
+        i1++;
 
         //快捷消息按钮发送模式
         CycleButton.Builder<ButtonMessageSendMode> sendModeBuilder = CycleButton.builder(mode -> Component.translatable(mode.getTranslateKey()));
@@ -163,18 +171,43 @@ public class ConfigScreen extends Screen {
                 .withValues(ButtonMessageSendMode.values())
                 .withInitialValue(this.options.buttonMessageSendMode)
                 .withTooltip((mode) -> Tooltip.create(Component.translatable(mode.getTooltipTranslateKey())))
-                .create(this.width / 2 - 150, this.height / 2, 300, 20,
+                .create(this.width / 2 - 150, baseHeight + (heightOffset * i1), 300, 20,
                         Component.translatable("quick_chat.config.chat_button.send_mode"),
                         (button, mode) -> {
                             this.options.buttonMessageSendMode = mode;
                             this.config.save();
                         });
 
+        i1++;
+
+        //展示为备注
+        this.displayAsComment = getCyclingButtonWidget(this.options.displayAsComment,
+                "quick_chat.config.display_as_comment",
+                "quick_chat.config.display_as_comment.desc",
+                this.width / 2 - 150, baseHeight + (heightOffset * i1),
+                (button, value) -> {
+                    this.options.displayAsComment = value;
+                    this.config.save();
+                });
+
+        this.chatQuickMessageButtonHeight = new OptionInstance<>("quick_chat.config.chat_button.height",
+                value -> Tooltip.create(Component.translatable("quick_chat.config.chat_button.height.desc")),
+                (optionText, value) -> genericValueLabel(optionText, Component.literal(value + "px")),
+                new OptionInstance.IntRange(10, 30),
+                Codec.INT.xmap(aInt -> 1, aInt -> 15),
+                this.options.chatQuickMessageButtonHeight,
+                aInt -> {
+                    this.options.chatQuickMessageButtonHeight = aInt;
+                    this.config.save();
+                }).createButton(this.minecraft.options, this.width / 2 + 2, baseHeight + (heightOffset * i1), 148);
+
+        i1++;
+
         //聊天栏内快捷消息列表
         this.chatQuickMessageButton = getCyclingButtonWidget(this.options.chatQuickMessageButton,
                 "quick_chat.config.chat_button",
                 "quick_chat.config.chat_button.desc",
-                this.width / 2 - 150, this.height / 2 + 26,
+                this.width / 2 - 150, baseHeight + (heightOffset * i1),
                 (button, value) -> {
                     this.options.chatQuickMessageButton = value;
                     this.chatQuickMessageButtonWidth.active = value;
@@ -191,13 +224,15 @@ public class ConfigScreen extends Screen {
                 aInt -> {
                     this.options.chatQuickMessageButtonWidth = aInt;
                     this.config.save();
-                }).createButton(this.minecraft.options, this.width / 2 + 2, this.height / 2 + 26, 148);
+                }).createButton(this.minecraft.options, this.width / 2 + 2, baseHeight + (heightOffset * i1), 148);
+
+        i1++;
 
         //消息冷却
         this.messageCoolingDownButton = getCyclingButtonWidget(this.options.messageCoolingDown,
                 "quick_chat.config.cooldown",
                 "quick_chat.config.cooldown.desc",
-                this.width / 2 - 150, this.height / 2 + 52,
+                this.width / 2 - 150, baseHeight + (heightOffset * i1),
                 (button, value) -> {
                     this.options.messageCoolingDown = value;
                     this.cooldownDurationButton.active = value;
@@ -214,13 +249,30 @@ public class ConfigScreen extends Screen {
                 aInt -> {
                     this.options.messageCoolingDuration = aInt;
                     this.config.save();
-                }).createButton(this.minecraft.options, this.width / 2 + 2, this.height / 2 + 52, 148);
+                }).createButton(this.minecraft.options, this.width / 2 + 2, baseHeight + (heightOffset * i1), 148);
     }
 
-    private CycleButton<Boolean> getCyclingButtonWidget(boolean init, String option, String tooltip, int x, int y, CycleButton.OnValueChange<Boolean> updateCallback) {
+    private CycleButton<Boolean> getCyclingButtonWidget(
+            boolean init,
+            String option,
+            String tooltip,
+            int x, int y,
+            CycleButton.OnValueChange<Boolean> updateCallback
+    ) {
+        return getCyclingButtonWidget(init, option, tooltip, x, y, 148, 20, updateCallback);
+    }
+
+    private CycleButton<Boolean> getCyclingButtonWidget(
+            boolean init,
+            String option,
+            String tooltip,
+            int x, int y,
+            int width, int height,
+            CycleButton.OnValueChange<Boolean> updateCallback
+    ) {
         return CycleButton.onOffBuilder(init)
                 .withTooltip(value -> Tooltip.create(Component.translatable(tooltip)))
-                .create(x, y, 148, 20, Component.translatable(option), updateCallback);
+                .create(x, y, width, height, Component.translatable(option), updateCallback);
     }
 
     private void updateCommandInfo() {
