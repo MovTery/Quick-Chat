@@ -1,6 +1,5 @@
 package com.movtery.quick_chat.gui.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,9 +20,6 @@ public class TransparentButton extends Button {
     @Override
     protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         Minecraft minecraft = Minecraft.getInstance();
-
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
 
         int color;
         int alpha = (int) (minecraft.options.textBackgroundOpacity().get() * 255);
