@@ -77,6 +77,7 @@ tasks.withType<Jar>().configureEach { dependsOn(tasks.named("stonecutterGenerate
 
 tasks.processResources {
     exclude("META-INF/forge.mods.toml", "fabric.mod.json")
+    inputs.properties(expandProps())
     val props = expandProps()
     // NeoForge 1.20.4 及以下读取 META-INF/mods.toml，1.20.5 起读取 META-INF/neoforge.mods.toml
     filesMatching("META-INF/neoforge.mods.toml") {

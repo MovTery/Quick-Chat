@@ -94,6 +94,7 @@ tasks.jar {
 tasks.processResources {
     dependsOn(tasks.named("stonecutterGenerate"))
     exclude("META-INF/neoforge.mods.toml", "fabric.mod.json")
+    inputs.properties(expandProps())
     val props = expandProps()
     filesMatching("META-INF/forge.mods.toml") {
         expand(props)

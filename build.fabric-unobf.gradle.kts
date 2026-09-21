@@ -57,6 +57,7 @@ tasks.withType<Jar>().configureEach { dependsOn(tasks.named("stonecutterGenerate
 tasks.processResources {
     dependsOn(tasks.named("stonecutterGenerate"))
     exclude("META-INF/forge.mods.toml", "META-INF/neoforge.mods.toml")
+    inputs.properties(expandProps())
     val props = expandProps()
     filesMatching(listOf("fabric.mod.json", "quick_chat.mixins.json", "pack.mcmeta")) {
         expand(props)

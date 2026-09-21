@@ -16,30 +16,33 @@ plugins {
 
 stonecutter {
     create(rootProject) {
-        fun match(minecraft: String, vararg loaders: String) =
-            loaders.forEach { loader ->
-                version("$minecraft-$loader", minecraft).buildscript = "build.$loader.gradle.kts"
-            }
+        // 每个节点代表一个代码兼容档；节点覆盖的版本区间记录在
+        // versions/<节点>/gradle.properties 的 deps.minecraft.range（fabric 另有 dep）中。
+        // 1.20.2/1.20.3、1.20.5、1.21.6 ~ 1.21.10（1.21.9 输入系统重构）未适配，不在支持范围内。
 
-        match("1.20.1", "fabric", "forge")
-        match("1.20.4", "fabric", "neoforge")
-        match("1.20.6", "fabric", "neoforge")
-        match("1.21", "fabric", "neoforge")
-        match("1.21.1", "fabric", "neoforge")
-        match("1.21.2", "fabric", "neoforge")
-        match("1.21.3", "fabric", "neoforge")
-        match("1.21.4", "fabric", "neoforge")
-        match("1.21.5", "fabric", "neoforge")
+        version("1.20.1-fabric", "1.20.1").buildscript = "build.fabric.gradle.kts"
+        version("1.20.1-forge", "1.20.1").buildscript = "build.forge.gradle.kts"
 
-        // 1.21.6+ 起使用新一代 Loom（fabric-loom-remap）
+        // [1.20.4, 1.21.6)：1.20.4 ~ 1.21.5 同代码档，逐版本编译验证过
+        version("1.20.4-fabric", "1.20.4").buildscript = "build.fabric.gradle.kts"
+        version("1.20.4-neoforge", "1.20.4").buildscript = "build.neoforge.gradle.kts"
+
+        version("1.20.6-neoforge", "1.20.6").buildscript = "build.neoforge.gradle.kts"
+
+        // [1.21, 1.21.6)：1.21 ~ 1.21.5 同代码档
+        version("1.21-neoforge", "1.21").buildscript = "build.neoforge.gradle.kts"
+
         version("1.21.11-fabric", "1.21.11").buildscript = "build.fabric-remap.gradle.kts"
         version("1.21.11-neoforge", "1.21.11").buildscript = "build.neoforge.gradle.kts"
+
         version("26.1-fabric", "26.1").buildscript = "build.fabric-unobf.gradle.kts"
         version("26.1-neoforge", "26.1").buildscript = "build.neoforge.gradle.kts"
+
+        // [26.2, 26.4)：26.3 同代码档
         version("26.2-fabric", "26.2").buildscript = "build.fabric-unobf.gradle.kts"
         version("26.2-neoforge", "26.2").buildscript = "build.neoforge.gradle.kts"
 
-        vcsVersion = "1.21.5-fabric"
+        vcsVersion = "26.2-fabric"
     }
 }
 

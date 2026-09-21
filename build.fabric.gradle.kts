@@ -19,7 +19,7 @@ fun Project.expandProps(): Map<String, String> = mapOf(
     "description" to prop("mod.description"),
     "java_version" to prop("deps.java"),
     "mixin_level" to if (prop("deps.java") == "21") "JAVA_21" else "JAVA_17",
-    "minecraft_dep" to prop("deps.minecraft"),
+    "minecraft_dep" to (if (hasProperty("deps.minecraft.dep")) prop("deps.minecraft.dep") else prop("deps.minecraft")),
     "fabric_loader_version" to prop("deps.fabric.loader"),
 )
 
@@ -69,6 +69,7 @@ tasks.withType<Jar>().configureEach { dependsOn(tasks.named("stonecutterGenerate
 
 tasks.processResources {
     exclude("META-INF/forge.mods.toml", "META-INF/neoforge.mods.toml")
+    inputs.properties(expandProps())
     val props = expandProps()
     filesMatching(listOf("fabric.mod.json", "quick_chat.mixins.json", "pack.mcmeta")) {
         expand(props)
