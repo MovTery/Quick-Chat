@@ -44,3 +44,9 @@ stonecutter {
 }
 
 rootProject.name = "quick-chat"
+
+
+if (System.getProperty("idea.sync.active") == "true") {
+    println("IDEA sync detected: neutralizing idea.sync.active for multi-node compatibility")
+    System.setProperty("idea.sync.active", "false")
+}
