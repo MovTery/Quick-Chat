@@ -3,19 +3,39 @@ package com.movtery.quick_chat.util;
 import com.movtery.quick_chat.Constants;
 import com.movtery.quick_chat.core.Config;
 import com.movtery.quick_chat.core.Message;
+//? if <1.21.11 {
 import net.minecraft.Util;
+//?} else {
+import net.minecraft.util.Util;
+//?}
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
+//? if <26.2 {
 import org.lwjgl.glfw.GLFW;
+//?} else {
+import com.mojang.blaze3d.platform.InputConstants;
+//?}
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 public final class QuickChatUtils {
     private QuickChatUtils() {
+    }
+
+    /**
+     * 打开一个屏幕，屏蔽了 26.2 中 setScreen 的更名
+     */
+    public static void openScreen(@NotNull Minecraft minecraft, @NotNull Screen screen) {
+        //? if <26.2 {
+        minecraft.setScreen(screen);
+        //?} else {
+        minecraft.setScreenAndShow(screen);
+        //?}
     }
 
     public static boolean notDoubleClick() {
@@ -35,7 +55,11 @@ public final class QuickChatUtils {
     }
 
     public static boolean isEnter(int keyCode) {
+        //? if <26.2 {
         return keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER;
+        //?} else {
+        return keyCode == InputConstants.KEY_RETURN || keyCode == InputConstants.KEY_NUMPADENTER;
+        //?}
     }
 
     public static void sendMessage(@NotNull Minecraft minecraft) {
@@ -60,7 +84,11 @@ public final class QuickChatUtils {
         long differ = timeNum - lastTime; //计算时间差
         if (!options.messageCoolingDown || (lastTime == 0 || differ > 1000 * duration)) {
             if (differ > 500) {
+                //? if <26.2 {
                 minecraft.gui.getChat().addRecentChat(message);
+                //?} else {
+                minecraft.gui.hud.getChat().addRecentChat(message);
+                //?}
 
                 if (!message.startsWith("/")) {
                     player.connection.sendChat(message);
@@ -73,7 +101,15 @@ public final class QuickChatUtils {
         } else {
             BigDecimal bigDecimal = BigDecimal.valueOf(duration);
             BigDecimal t = bigDecimal.subtract(BigDecimal.valueOf(differ / 1000.0));
+            //? if <26.1 {
             player.displayClientMessage(Component.translatable("quick_chat.in_game.too_often").append(String.format(" %.2fs", t)), true);
+            //?}
+            //? if 26.1 {
+            minecraft.gui.getChat().addClientSystemMessage(Component.translatable("quick_chat.in_game.too_often").append(String.format(" %.2fs", t)));
+            //?}
+            //? if >=26.2 {
+            minecraft.gui.hud.getChat().addClientSystemMessage(Component.translatable("quick_chat.in_game.too_often").append(String.format(" %.2fs", t)));
+            //?}
         }
     }
 

@@ -3,12 +3,21 @@ package com.movtery.quick_chat.gui;
 import com.mojang.serialization.Codec;
 import com.movtery.quick_chat.Constants;
 import com.movtery.quick_chat.core.ButtonMessageSendMode;
+import com.movtery.quick_chat.util.QuickChatUtils;
 import com.movtery.quick_chat.core.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
+//? if <26.1 {
 import net.minecraft.client.gui.GuiGraphics;
+//?} else {
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?}
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.Button;
+//? if >=1.21.11 {
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+//?}
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -70,6 +79,7 @@ public class ConfigScreen extends Screen {
         this.chatQuickMessageButtonWidth.active = this.options.chatQuickMessageButton;
     }
 
+    //? if <26.1 {
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         //? if <1.20.2 {
@@ -85,7 +95,22 @@ public class ConfigScreen extends Screen {
 
         this.commandSuggestions.render(guiGraphics, mouseX, mouseY);
     }
+    //?} else {
+    @Override
+    public void extractRenderState(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        this.messageField.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
 
+        graphics.centeredText(this.font, this.title, this.width / 2, 20, 16777215);
+        graphics.text(this.font, Component.translatable("quick_chat.config.message")
+                        .append(this.textEmpty ? Component.translatable("quick_chat.config.message.empty") : Component.literal("")),
+                this.width / 2 - 150 + 1, 40, this.textEmpty ? Color.RED.getRGB() : 16777215); //如果消息内容为空，那么加入提醒，颜色设置为红色
+
+        this.commandSuggestions.extractRenderState(graphics, mouseX, mouseY);
+    }
+    //?}
+
+    //? if <1.21.11 {
     @Override
     public void resize(@NotNull Minecraft minecraft, int width, int height) {
         String message = this.messageField.getValue();
@@ -93,19 +118,37 @@ public class ConfigScreen extends Screen {
         this.messageField.setValue(message);
         updateCommandInfo();
     }
+    //?} else {
+    @Override
+    public void resize(int width, int height) {
+        String message = this.messageField.getValue();
+        this.init(width, height);
+        this.messageField.setValue(message);
+        updateCommandInfo();
+    }
+    //?}
 
     @Override
     public void onClose() {
         if (this.minecraft == null) return;
-        if (saveText(this.minecraft)) this.minecraft.setScreen(this.parent);
+        if (saveText(this.minecraft)) QuickChatUtils.openScreen(this.minecraft, this.parent);
     }
 
+    //? if <1.21.11 {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (this.commandSuggestions.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         } else return super.keyPressed(keyCode, scanCode, modifiers);
     }
+    //?} else {
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (this.commandSuggestions.keyPressed(event)) {
+            return true;
+        } else return super.keyPressed(event);
+    }
+    //?}
 
     //? if <1.20.2 {
     @Override
@@ -119,10 +162,17 @@ public class ConfigScreen extends Screen {
     }
     //?}
 
+    //? if <1.21.11 {
     @Override
     public boolean mouseClicked(double d, double e, int i) {
         return this.commandSuggestions.mouseClicked(d, e, i) || super.mouseClicked(d, e, i);
     }
+    //?} else {
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
+        return this.commandSuggestions.mouseClicked(event) || super.mouseClicked(event, doubled);
+    }
+    //?}
 
     private void bindButton() {
         if (this.minecraft == null) return;
@@ -167,7 +217,7 @@ public class ConfigScreen extends Screen {
         this.messageListButton = Button.builder(Component.translatable("quick_chat.gui.message_list.title"), button -> {
                     if (this.minecraft == null) return;
 
-                    if (saveText(this.minecraft)) this.minecraft.setScreen(new QuickMessageListScreen(this));
+                    if (saveText(this.minecraft)) QuickChatUtils.openScreen(this.minecraft, new QuickMessageListScreen(this));
                 }).tooltip(Tooltip.create(Component.translatable("quick_chat.config.message_list.desc")))
                 .bounds(this.width / 2 + 2, baseHeight + (heightOffset * i1), 148, 20)
                 .build();
@@ -175,10 +225,16 @@ public class ConfigScreen extends Screen {
         i1++;
 
         //快捷消息按钮发送模式
-        CycleButton.Builder<ButtonMessageSendMode> sendModeBuilder = CycleButton.builder(mode -> Component.translatable(mode.getTranslateKey()));
-        this.messageSendModeButton = sendModeBuilder
+        CycleButton.Builder<ButtonMessageSendMode> sendModeBuilder;
+        //? if <1.21.11 {
+        sendModeBuilder = CycleButton.<ButtonMessageSendMode>builder(mode -> Component.translatable(mode.getTranslateKey()))
                 .withValues(ButtonMessageSendMode.values())
-                .withInitialValue(this.options.buttonMessageSendMode)
+                .withInitialValue(this.options.buttonMessageSendMode);
+        //?} else {
+        sendModeBuilder = CycleButton.builder(mode -> Component.translatable(mode.getTranslateKey()), this.options.buttonMessageSendMode)
+                .withValues(ButtonMessageSendMode.values());
+        //?}
+        this.messageSendModeButton = sendModeBuilder
                 .withTooltip((mode) -> Tooltip.create(Component.translatable(mode.getTooltipTranslateKey())))
                 .create(this.width / 2 - 150, baseHeight + (heightOffset * i1), 300, 20,
                         Component.translatable("quick_chat.config.chat_button.send_mode"),
@@ -294,7 +350,7 @@ public class ConfigScreen extends Screen {
         //切换屏幕之前需要保存文本，如果为空则不允许切换屏幕
         String text = this.messageField.getValue();
         if (text.isEmpty()) {
-            client.setScreen(new ConfigScreen(this.parent, true));
+            QuickChatUtils.openScreen(client, new ConfigScreen(this.parent, true));
             return false;
         } else {
             this.textEmpty = false;

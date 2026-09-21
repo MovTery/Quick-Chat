@@ -5,10 +5,18 @@ import com.movtery.quick_chat.core.Config;
 import com.movtery.quick_chat.core.Message;
 import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.client.Minecraft;
+//? if <26.1 {
 import net.minecraft.client.gui.GuiGraphics;
+//?} else {
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?}
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.components.EditBox;
+//? if >=1.21.11 {
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+//?}
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -76,9 +84,10 @@ public class AddMessageScreen extends Screen {
     @Override
     public void onClose() {
         if (this.minecraft == null) return;
-        this.minecraft.setScreen(this.parent);
+        QuickChatUtils.openScreen(this.minecraft, this.parent);
     }
 
+    //? if <26.1 {
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         //? if <1.20.2 {
@@ -95,7 +104,23 @@ public class AddMessageScreen extends Screen {
 
         this.commandSuggestions.render(guiGraphics, mouseX, mouseY);
     }
+    //?} else {
+    @Override
+    public void extractRenderState(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        this.messageField.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
 
+        graphics.textWithWordWrap(this.font, Component.translatable("quick_chat.config.comment"), this.width / 2 - 150, this.height - 110, 500, 16777215);
+        this.commentField.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
+
+        graphics.centeredText(this.font, this.title, this.width / 2, 20, 16777215);
+        graphics.textWithWordWrap(this.font, Component.translatable("quick_chat.config.message.desc"), this.width / 2 - 150, this.height - 70, 500, 16777215);
+
+        this.commandSuggestions.extractRenderState(graphics, mouseX, mouseY);
+    }
+    //?}
+
+    //? if <1.21.11 {
     @Override
     public void resize(@NotNull Minecraft minecraft, int width, int height) {
         String message = this.messageField.getValue();
@@ -105,7 +130,19 @@ public class AddMessageScreen extends Screen {
         this.commentField.setValue(comment);
         updateCommandInfo();
     }
+    //?} else {
+    @Override
+    public void resize(int width, int height) {
+        String message = this.messageField.getValue();
+        String comment = this.commentField.getValue();
+        this.init(width, height);
+        this.messageField.setValue(message);
+        this.commentField.setValue(comment);
+        updateCommandInfo();
+    }
+    //?}
 
+    //? if <1.21.11 {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (this.commandSuggestions.keyPressed(keyCode, scanCode, modifiers)) {
@@ -119,6 +156,21 @@ public class AddMessageScreen extends Screen {
             return true;
         }
     }
+    //?} else {
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (this.commandSuggestions.keyPressed(event)) {
+            return true;
+        } else if (super.keyPressed(event)) {
+            return true;
+        } else if (!QuickChatUtils.isEnter(event.key())) {
+            return false;
+        } else {
+            this.addMessage();
+            return true;
+        }
+    }
+    //?}
 
     //? if <1.20.2 {
     @Override
@@ -132,10 +184,17 @@ public class AddMessageScreen extends Screen {
     }
     //?}
 
+    //? if <1.21.11 {
     @Override
     public boolean mouseClicked(double d, double e, int i) {
         return this.commandSuggestions.mouseClicked(d, e, i) || super.mouseClicked(d, e, i);
     }
+    //?} else {
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
+        return this.commandSuggestions.mouseClicked(event) || super.mouseClicked(event, doubled);
+    }
+    //?}
 
     private void updateCommandInfo() {
         if (this.minecraft != null && this.minecraft.player != null) {

@@ -6,14 +6,28 @@ import com.movtery.quick_chat.core.Message;
 import com.movtery.quick_chat.util.LastMessage;
 import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.ChatFormatting;
+//? if <1.21.11 {
 import net.minecraft.Util;
+//?} else {
+import net.minecraft.util.Util;
+//?}
 import net.minecraft.client.Minecraft;
+//? if <26.1 {
 import net.minecraft.client.gui.GuiGraphics;
+//?} else {
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?}
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.Tooltip;
+//? if >=1.21.11 {
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+//?}
 import net.minecraft.client.gui.screens.Screen;
+//? if <1.21.11 {
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+//?}
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -59,9 +73,10 @@ public class QuickMessageListScreen extends Screen {
     @Override
     public void onClose() {
         if (this.minecraft == null) return;
-        this.minecraft.setScreen(parent);
+        QuickChatUtils.openScreen(this.minecraft, parent);
     }
 
+    //? if <26.1 {
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         //? if <1.20.2 {
@@ -76,7 +91,21 @@ public class QuickMessageListScreen extends Screen {
                                 Component.translatable("quick_chat.gui.message_list.tip").withStyle(ChatFormatting.WHITE)),
                 this.width / 2, this.height - 54, 16777215);
     }
+    //?} else {
+    @Override
+    public void extractRenderState(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        graphics.centeredText(this.font, this.title, this.width / 2, 16, 16777215);
+        graphics.centeredText(this.font,
+                Component.literal(String.format("(%d) ", this.messageListWidget.children().size())).withStyle(ChatFormatting.YELLOW)
+                        .append(config.getOptions().messageWithComment.isEmpty() ?
+                                Component.translatable("quick_chat.gui.message_list.tip_empty").withStyle(ChatFormatting.RED) :
+                                Component.translatable("quick_chat.gui.message_list.tip").withStyle(ChatFormatting.WHITE)),
+                this.width / 2, this.height - 54, 16777215);
+    }
+    //?}
 
+    //? if <1.21.11 {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (Minecraft.getInstance().player != null && QuickChatUtils.isEnter(keyCode)) {
@@ -85,6 +114,16 @@ public class QuickMessageListScreen extends Screen {
 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
+    //?} else {
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (Minecraft.getInstance().player != null && QuickChatUtils.isEnter(event.key())) {
+            this.onDone();
+        }
+
+        return super.keyPressed(event);
+    }
+    //?}
 
     private void onDone() {
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelected();
@@ -108,20 +147,20 @@ public class QuickMessageListScreen extends Screen {
         }
 
         if (this.minecraft != null) {
-            this.minecraft.setScreen(this);
+            QuickChatUtils.openScreen(this.minecraft, this);
         }
     }
 
     private void addMessage() {
         if (this.minecraft == null) return;
-        this.minecraft.setScreen(new AddMessageScreen(this));
+        QuickChatUtils.openScreen(this.minecraft, new AddMessageScreen(this));
     }
 
     private void edit() {
         if (this.minecraft == null) return;
         MessageListWidget.MessageListEntry messageListEntry = this.messageListWidget.getSelected();
         if (messageListEntry != null) {
-            this.minecraft.setScreen(new AddMessageScreen(this, messageListEntry.getMessage()));
+            QuickChatUtils.openScreen(this.minecraft, new AddMessageScreen(this, messageListEntry.getMessage()));
         }
     }
 
@@ -184,7 +223,7 @@ public class QuickMessageListScreen extends Screen {
             private final MessageListWidget list;
             private final Message message;
             final String abbreviatedText;
-            private final Tooltip tooltip;
+            private final Component tooltip;
             private long clickTime;
             final int index;
 
@@ -199,30 +238,66 @@ public class QuickMessageListScreen extends Screen {
                     showOnEntry = messageObject.getMessage();
                 }
                 this.abbreviatedText = QuickChatUtils.getAbbreviatedText(showOnEntry, minecraft, list.getRowWidth() - 30);
-                this.tooltip = Tooltip.create(QuickChatUtils.getMessageComponent(messageObject));
+                this.tooltip = QuickChatUtils.getMessageComponent(messageObject);
             }
 
             public Message getMessage() {
                 return this.message;
             }
 
+            //? if <1.21.11 {
             @Override
             public void render(GuiGraphics guiGraphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-                int textY = y + 2;
+                renderEntry(guiGraphics, mouseX, mouseY, y + 2);
 
+                if (this.isMouseOver(mouseX, mouseY)) {
+                    Screen screen = Minecraft.getInstance().screen;
+                    if (screen != null) screen.setTooltipForNextRenderPass(Tooltip.create(this.tooltip), DefaultTooltipPositioner.INSTANCE, this.isFocused());
+                }
+            }
+            //?}
+            //? if 1.21.11 {
+            @Override
+            public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+                renderEntry(guiGraphics, mouseX, mouseY, this.getContentY());
+
+                if (this.isMouseOver(mouseX, mouseY)) {
+                    guiGraphics.setTooltipForNextFrame(this.tooltip, mouseX, mouseY);
+                }
+            }
+            //?}
+            //? if >=26.1 {
+            @Override
+            public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+                renderEntry(graphics, mouseX, mouseY, this.getContentY());
+
+                if (this.isMouseOver(mouseX, mouseY)) {
+                    graphics.setTooltipForNextFrame(this.tooltip, mouseX, mouseY);
+                }
+            }
+            //?}
+
+            //? if <26.1 {
+            private void renderEntry(GuiGraphics guiGraphics, int mouseX, int mouseY, int textY) {
                 guiGraphics.drawCenteredString(minecraft.font, this.abbreviatedText, MessageListWidget.this.width / 2, textY, 16777215);
 
                 int entryX = list.getRowLeft() + list.getRowWidth();
 
                 guiGraphics.drawString(minecraft.font, "↓", entryX - 11, textY, 16777215);
                 guiGraphics.drawString(minecraft.font, "↑", entryX - 20, textY, 16777215);
-
-                if (this.isMouseOver(mouseX, mouseY)) {
-                    Screen screen = Minecraft.getInstance().screen;
-                    if (screen != null) screen.setTooltipForNextRenderPass(this.tooltip, DefaultTooltipPositioner.INSTANCE, this.isFocused());
-                }
             }
+            //?} else {
+            private void renderEntry(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int textY) {
+                graphics.centeredText(minecraft.font, this.abbreviatedText, MessageListWidget.this.width / 2, textY, 16777215);
 
+                int entryX = list.getRowLeft() + list.getRowWidth();
+
+                graphics.text(minecraft.font, "↓", entryX - 11, textY, 16777215);
+                graphics.text(minecraft.font, "↑", entryX - 20, textY, 16777215);
+            }
+            //?}
+
+            //? if <1.21.11 {
             public boolean mouseClicked(double mouseX, double mouseY, int button) {
                 this.onPressed();
                 long millis = Util.getMillis();
@@ -244,6 +319,31 @@ public class QuickMessageListScreen extends Screen {
 
                 return true;
             }
+            //?} else {
+            @Override
+            public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
+                this.onPressed();
+                long millis = Util.getMillis();
+                double mouseX = event.x();
+
+                int entryX = list.getRowLeft() + list.getRowWidth();
+
+                if (mouseX >= entryX - 20 && mouseX <= entryX - 12) {
+                    moveEntryUp(this);
+                    return true;
+                } else if (mouseX >= entryX - 12 && mouseX <= entryX) {
+                    moveEntryDown(this);
+                    return true;
+                } else {
+                    if (Minecraft.getInstance().player != null && millis - this.clickTime < 250L) {
+                        QuickMessageListScreen.this.onDone();
+                    }
+                    this.clickTime = millis;
+                }
+
+                return true;
+            }
+            //?}
 
             void onPressed() {
                 MessageListWidget.this.setSelected(this);

@@ -1,5 +1,5 @@
 plugins {
-    id("fabric-loom") version "1.13.6"
+    id("net.fabricmc.fabric-loom") version "1.18.2"
 }
 
 stonecutter {
@@ -18,8 +18,8 @@ fun Project.expandProps(): Map<String, String> = mapOf(
     "license" to prop("mod.license"),
     "description" to prop("mod.description"),
     "java_version" to prop("deps.java"),
-    "mixin_level" to if (prop("deps.java") == "21") "JAVA_21" else "JAVA_17",
-    "minecraft_dep" to prop("deps.minecraft"),
+    "mixin_level" to "JAVA_21",
+    "minecraft_dep" to (if (hasProperty("deps.minecraft.dep")) prop("deps.minecraft.dep") else prop("deps.minecraft")),
     "fabric_loader_version" to prop("deps.fabric.loader"),
 )
 
@@ -32,27 +32,14 @@ java {
 }
 
 repositories {
-    maven("https://maven.parchmentmc.org/") { name = "ParchmentMC" }
     maven("https://maven.terraformersmc.com/releases/") { name = "TerraformersMC" }
-    maven("https://maven.nucleoid.xyz/") { name = "Nucleoid" }
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:${prop("deps.minecraft")}")
-    mappings(loom.layered {
-        officialMojangMappings()
-        if (hasProperty("deps.parchment")) {
-            val (mc, ver) = prop("deps.parchment").split(':')
-            parchment("org.parchmentmc.data:parchment-$mc:$ver@zip")
-        }
-    })
-    modImplementation("net.fabricmc:fabric-loader:${prop("deps.fabric.loader")}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${prop("deps.fabric.api")}")
-    modImplementation("com.terraformersmc:modmenu:${prop("deps.modmenu")}")
-}
-
-loom {
-    mixin { defaultRefmapName = "${prop("mod.id")}.refmap.json" }
+    implementation("net.fabricmc:fabric-loader:${prop("deps.fabric.loader")}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${prop("deps.fabric.api")}")
+    implementation("com.terraformersmc:modmenu:${prop("deps.modmenu")}")
 }
 
 // 编译与资源处理均使用 Stonecutter 预处理后的源码
@@ -68,6 +55,7 @@ tasks.withType<ProcessResources>().configureEach { dependsOn(tasks.named("stonec
 tasks.withType<Jar>().configureEach { dependsOn(tasks.named("stonecutterGenerate")) }
 
 tasks.processResources {
+    dependsOn(tasks.named("stonecutterGenerate"))
     exclude("META-INF/forge.mods.toml", "META-INF/neoforge.mods.toml")
     val props = expandProps()
     filesMatching(listOf("fabric.mod.json", "quick_chat.mixins.json", "pack.mcmeta")) {

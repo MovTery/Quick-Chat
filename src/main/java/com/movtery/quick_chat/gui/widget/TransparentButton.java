@@ -3,9 +3,17 @@ package com.movtery.quick_chat.gui.widget;
 //? if <1.21.5 {
 import com.mojang.blaze3d.systems.RenderSystem;
 //?}
+//? if <1.21.11 {
 import net.minecraft.Util;
+//?} else {
+import net.minecraft.util.Util;
+//?}
 import net.minecraft.client.Minecraft;
+//? if <26.1 {
 import net.minecraft.client.gui.GuiGraphics;
+//?} else {
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+//?}
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
@@ -20,8 +28,27 @@ public class TransparentButton extends Button {
         super(x, y, width, height, message, onPress, mutableComponentSupplier -> message.copy());
     }
 
+    //? if <1.21.11 {
     @Override
     protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        drawContents(guiGraphics, mouseX, mouseY, delta);
+    }
+    //?}
+    //? if 1.21.11 {
+    @Override
+    protected void renderContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        drawContents(guiGraphics, mouseX, mouseY, delta);
+    }
+    //?}
+    //? if >=26.1 {
+    @Override
+    protected void extractContents(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        drawContents(graphics, mouseX, mouseY, delta);
+    }
+    //?}
+
+    //? if <26.1 {
+    private void drawContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         Minecraft minecraft = Minecraft.getInstance();
 
         //? if <1.21.5 {
@@ -40,6 +67,22 @@ public class TransparentButton extends Button {
         int textY = this.getY() + (this.getHeight() - minecraft.font.lineHeight) / 2 + 1; //自适应纵向居中 (+1 为视觉偏移)
         guiGraphics.drawString(minecraft.font, this.getMessage(), this.getX() + 4, textY, textColor);
     }
+    //?} else {
+    private void drawContents(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        Minecraft minecraft = Minecraft.getInstance();
+
+        int color;
+        int alpha = (int) (minecraft.options.textBackgroundOpacity().get() * 255);
+        if (this.isHovered()) color = packARGB(alpha, 255, 255, 255);
+        else color = packARGB(alpha, 0, 0, 0);
+
+        graphics.fill(this.getX(), this.getY() + this.getHeight(), this.getX() + this.getWidth(), this.getY(), color);
+
+        int textColor = (this.active ? 16777215 : 10526880) | Mth.ceil(this.getAlpha() * 255.0F) << 24;
+        int textY = this.getY() + (this.getHeight() - minecraft.font.lineHeight) / 2 + 1; //自适应纵向居中 (+1 为视觉偏移)
+        graphics.text(minecraft.font, this.getMessage(), this.getX() + 4, textY, textColor);
+    }
+    //?}
 
     private int packARGB(int alpha, int red, int green, int blue) {
         return (alpha << 24) | (red << 16) | (green << 8) | blue;

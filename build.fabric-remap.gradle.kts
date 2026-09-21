@@ -1,5 +1,5 @@
 plugins {
-    id("fabric-loom") version "1.13.6"
+    id("net.fabricmc.fabric-loom-remap") version "1.18.2"
 }
 
 stonecutter {
@@ -18,7 +18,7 @@ fun Project.expandProps(): Map<String, String> = mapOf(
     "license" to prop("mod.license"),
     "description" to prop("mod.description"),
     "java_version" to prop("deps.java"),
-    "mixin_level" to if (prop("deps.java") == "21") "JAVA_21" else "JAVA_17",
+    "mixin_level" to if (prop("deps.java") == "17") "JAVA_17" else "JAVA_21",
     "minecraft_dep" to prop("deps.minecraft"),
     "fabric_loader_version" to prop("deps.fabric.loader"),
 )
@@ -41,10 +41,6 @@ dependencies {
     minecraft("com.mojang:minecraft:${prop("deps.minecraft")}")
     mappings(loom.layered {
         officialMojangMappings()
-        if (hasProperty("deps.parchment")) {
-            val (mc, ver) = prop("deps.parchment").split(':')
-            parchment("org.parchmentmc.data:parchment-$mc:$ver@zip")
-        }
     })
     modImplementation("net.fabricmc:fabric-loader:${prop("deps.fabric.loader")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${prop("deps.fabric.api")}")
@@ -68,6 +64,7 @@ tasks.withType<ProcessResources>().configureEach { dependsOn(tasks.named("stonec
 tasks.withType<Jar>().configureEach { dependsOn(tasks.named("stonecutterGenerate")) }
 
 tasks.processResources {
+    dependsOn(tasks.named("stonecutterGenerate"))
     exclude("META-INF/forge.mods.toml", "META-INF/neoforge.mods.toml")
     val props = expandProps()
     filesMatching(listOf("fabric.mod.json", "quick_chat.mixins.json", "pack.mcmeta")) {

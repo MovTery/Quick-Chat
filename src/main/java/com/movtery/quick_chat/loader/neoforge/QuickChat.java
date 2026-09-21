@@ -44,8 +44,12 @@ public class QuickChat {
 
     //? if <1.20.5 {
     @Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    //?} else {
+    //?}
+    //? if 1.20.6 {
     @EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    //?}
+    //? if >=1.21 {
+    @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
     //?}
     public static class ClientModEvents {
         @SubscribeEvent
