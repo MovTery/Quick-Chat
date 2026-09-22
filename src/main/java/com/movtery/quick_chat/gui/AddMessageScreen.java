@@ -96,11 +96,11 @@ public class AddMessageScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.messageField.render(guiGraphics, mouseX, mouseY, delta);
 
-        guiGraphics.drawWordWrap(this.font, Component.translatable("quick_chat.config.comment"), this.width / 2 - 150, this.height - 110, 500, 16777215);
+        guiGraphics.drawWordWrap(this.font, Component.translatable("quick_chat.config.comment"), this.width / 2 - 150, this.height - 110, 500, 0xFFFFFFFF);
         this.commentField.render(guiGraphics, mouseX, mouseY, delta);
 
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 16777215);
-        guiGraphics.drawWordWrap(this.font, Component.translatable("quick_chat.config.message.desc"), this.width / 2 - 150, this.height - 70, 500, 16777215);
+        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
+        guiGraphics.drawWordWrap(this.font, Component.translatable("quick_chat.config.message.desc"), this.width / 2 - 150, this.height - 70, 500, 0xFFFFFFFF);
 
         this.commandSuggestions.render(guiGraphics, mouseX, mouseY);
     }
@@ -110,11 +110,11 @@ public class AddMessageScreen extends Screen {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
         this.messageField.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
 
-        graphics.textWithWordWrap(this.font, Component.translatable("quick_chat.config.comment"), this.width / 2 - 150, this.height - 110, 500, 16777215);
+        graphics.textWithWordWrap(this.font, Component.translatable("quick_chat.config.comment"), this.width / 2 - 150, this.height - 110, 500, 0xFFFFFFFF);
         this.commentField.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
 
-        graphics.centeredText(this.font, this.title, this.width / 2, 20, 16777215);
-        graphics.textWithWordWrap(this.font, Component.translatable("quick_chat.config.message.desc"), this.width / 2 - 150, this.height - 70, 500, 16777215);
+        graphics.centeredText(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
+        graphics.textWithWordWrap(this.font, Component.translatable("quick_chat.config.message.desc"), this.width / 2 - 150, this.height - 70, 500, 0xFFFFFFFF);
 
         this.commandSuggestions.extractRenderState(graphics, mouseX, mouseY);
     }

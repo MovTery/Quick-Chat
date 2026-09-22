@@ -83,25 +83,25 @@ public class QuickMessageListScreen extends Screen {
         this.renderBackground(guiGraphics);
         //?}
         super.render(guiGraphics, mouseX, mouseY, delta);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 16777215);
+        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 0xFFFFFFFF);
         guiGraphics.drawCenteredString(this.font,
                 Component.literal(String.format("(%d) ", this.messageListWidget.children().size())).withStyle(ChatFormatting.YELLOW)
                         .append(config.getOptions().messageWithComment.isEmpty() ?
                                 Component.translatable("quick_chat.gui.message_list.tip_empty").withStyle(ChatFormatting.RED) :
                                 Component.translatable("quick_chat.gui.message_list.tip").withStyle(ChatFormatting.WHITE)),
-                this.width / 2, this.height - 54, 16777215);
+                this.width / 2, this.height - 54, 0xFFFFFFFF);
     }
     //?} else {
     @Override
     public void extractRenderState(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
-        graphics.centeredText(this.font, this.title, this.width / 2, 16, 16777215);
+        graphics.centeredText(this.font, this.title, this.width / 2, 16, 0xFFFFFFFF);
         graphics.centeredText(this.font,
                 Component.literal(String.format("(%d) ", this.messageListWidget.children().size())).withStyle(ChatFormatting.YELLOW)
                         .append(config.getOptions().messageWithComment.isEmpty() ?
                                 Component.translatable("quick_chat.gui.message_list.tip_empty").withStyle(ChatFormatting.RED) :
                                 Component.translatable("quick_chat.gui.message_list.tip").withStyle(ChatFormatting.WHITE)),
-                this.width / 2, this.height - 54, 16777215);
+                this.width / 2, this.height - 54, 0xFFFFFFFF);
     }
     //?}
 
@@ -279,21 +279,21 @@ public class QuickMessageListScreen extends Screen {
 
             //? if <26.1 {
             private void renderEntry(GuiGraphics guiGraphics, int mouseX, int mouseY, int textY) {
-                guiGraphics.drawCenteredString(minecraft.font, this.abbreviatedText, MessageListWidget.this.width / 2, textY, 16777215);
+                guiGraphics.drawCenteredString(minecraft.font, this.abbreviatedText, MessageListWidget.this.width / 2, textY, 0xFFFFFFFF);
 
                 int entryX = list.getRowLeft() + list.getRowWidth();
 
-                guiGraphics.drawString(minecraft.font, "↓", entryX - 11, textY, 16777215);
-                guiGraphics.drawString(minecraft.font, "↑", entryX - 20, textY, 16777215);
+                guiGraphics.drawString(minecraft.font, "↓", entryX - 11, textY, 0xFFFFFFFF);
+                guiGraphics.drawString(minecraft.font, "↑", entryX - 20, textY, 0xFFFFFFFF);
             }
             //?} else {
             private void renderEntry(GuiGraphicsExtractor graphics, int mouseX, int mouseY, int textY) {
-                graphics.centeredText(minecraft.font, this.abbreviatedText, MessageListWidget.this.width / 2, textY, 16777215);
+                graphics.centeredText(minecraft.font, this.abbreviatedText, MessageListWidget.this.width / 2, textY, 0xFFFFFFFF);
 
                 int entryX = list.getRowLeft() + list.getRowWidth();
 
-                graphics.text(minecraft.font, "↓", entryX - 11, textY, 16777215);
-                graphics.text(minecraft.font, "↑", entryX - 20, textY, 16777215);
+                graphics.text(minecraft.font, "↓", entryX - 11, textY, 0xFFFFFFFF);
+                graphics.text(minecraft.font, "↑", entryX - 20, textY, 0xFFFFFFFF);
             }
             //?}
 

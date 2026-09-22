@@ -88,10 +88,10 @@ public class ConfigScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.messageField.render(guiGraphics, mouseX, mouseY, delta);
 
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 16777215);
+        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
         guiGraphics.drawString(this.font, Component.translatable("quick_chat.config.message")
                         .append(this.textEmpty ? Component.translatable("quick_chat.config.message.empty") : Component.literal("")),
-                this.width / 2 - 150 + 1, 40, this.textEmpty ? Color.RED.getRGB() : 16777215); //如果消息内容为空，那么加入提醒，颜色设置为红色
+                this.width / 2 - 150 + 1, 40, this.textEmpty ? Color.RED.getRGB() : 0xFFFFFFFF); //如果消息内容为空，那么加入提醒，颜色设置为红色
 
         this.commandSuggestions.render(guiGraphics, mouseX, mouseY);
     }
@@ -101,10 +101,10 @@ public class ConfigScreen extends Screen {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
         this.messageField.extractWidgetRenderState(graphics, mouseX, mouseY, delta);
 
-        graphics.centeredText(this.font, this.title, this.width / 2, 20, 16777215);
+        graphics.centeredText(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
         graphics.text(this.font, Component.translatable("quick_chat.config.message")
                         .append(this.textEmpty ? Component.translatable("quick_chat.config.message.empty") : Component.literal("")),
-                this.width / 2 - 150 + 1, 40, this.textEmpty ? Color.RED.getRGB() : 16777215); //如果消息内容为空，那么加入提醒，颜色设置为红色
+                this.width / 2 - 150 + 1, 40, this.textEmpty ? Color.RED.getRGB() : 0xFFFFFFFF); //如果消息内容为空，那么加入提醒，颜色设置为红色
 
         this.commandSuggestions.extractRenderState(graphics, mouseX, mouseY);
     }
