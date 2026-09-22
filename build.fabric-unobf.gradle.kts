@@ -42,12 +42,16 @@ dependencies {
     implementation("com.terraformersmc:modmenu:${prop("deps.modmenu")}")
 }
 
-// 编译与资源处理均使用 Stonecutter 预处理后的源码
 val generatedStonecutter = layout.buildDirectory.dir("generated/stonecutter/main")
 
 sourceSets.main {
-    java.setSrcDirs(listOf(generatedStonecutter.map { it.dir("java") }))
-    resources.setSrcDirs(listOf(generatedStonecutter.map { it.dir("resources") }))
+    if (stonecutter.current.isActive) {
+        java.setSrcDirs(listOf(rootDir.resolve("src/main/java")))
+        resources.setSrcDirs(listOf(rootDir.resolve("src/main/resources")))
+    } else {
+        java.setSrcDirs(listOf(generatedStonecutter.map { it.dir("java") }))
+        resources.setSrcDirs(listOf(generatedStonecutter.map { it.dir("resources") }))
+    }
 }
 
 tasks.compileJava { dependsOn(tasks.named("stonecutterGenerate")) }
