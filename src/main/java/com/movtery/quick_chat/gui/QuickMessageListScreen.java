@@ -262,7 +262,7 @@ public class QuickMessageListScreen extends Screen {
                 renderEntry(guiGraphics, mouseX, mouseY, y + 2);
 
                 if (this.isMouseOver(mouseX, mouseY)) {
-                    guiGraphics.setTooltipForNextFrame(this.tooltip, mouseX, mouseY);
+                    guiGraphics.setTooltipForNextFrame(QuickChatUtils.splitTooltipLines(this.tooltip), mouseX, mouseY);
                 }
             }
             *///?}
@@ -272,7 +272,7 @@ public class QuickMessageListScreen extends Screen {
                 renderEntry(guiGraphics, mouseX, mouseY, this.getContentY());
 
                 if (this.isMouseOver(mouseX, mouseY)) {
-                    guiGraphics.setTooltipForNextFrame(this.tooltip, mouseX, mouseY);
+                    guiGraphics.setTooltipForNextFrame(QuickChatUtils.splitTooltipLines(this.tooltip), mouseX, mouseY);
                 }
             }
             *///?}
@@ -282,7 +282,7 @@ public class QuickMessageListScreen extends Screen {
                 renderEntry(graphics, mouseX, mouseY, this.getContentY());
 
                 if (this.isMouseOver(mouseX, mouseY)) {
-                    graphics.setTooltipForNextFrame(this.tooltip, mouseX, mouseY);
+                    graphics.setTooltipForNextFrame(QuickChatUtils.splitTooltipLines(this.tooltip), mouseX, mouseY);
                 }
             }
             //?}

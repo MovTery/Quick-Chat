@@ -52,12 +52,12 @@ public final class WheelRendering {
     *///?}
     //? if >=1.21.6 && <26.1 {
     /*public static void showTooltip(@NotNull GuiGraphics graphics, @NotNull Component tooltip, int mouseX, int mouseY) {
-        graphics.setTooltipForNextFrame(tooltip, mouseX, mouseY);
+        graphics.setTooltipForNextFrame(QuickChatUtils.splitTooltipLines(tooltip), mouseX, mouseY);
     }
     *///?}
     //? if >=26.1 {
     public static void showTooltip(@NotNull GuiGraphicsExtractor graphics, @NotNull Component tooltip, int mouseX, int mouseY) {
-        graphics.setTooltipForNextFrame(tooltip, mouseX, mouseY);
+        graphics.setTooltipForNextFrame(QuickChatUtils.splitTooltipLines(tooltip), mouseX, mouseY);
     }
     //?}
 

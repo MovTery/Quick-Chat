@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.NotNull;
 //? if <26.2 {
 /*import org.lwjgl.glfw.GLFW;
@@ -17,6 +18,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public final class QuickChatUtils {
     private QuickChatUtils() {
@@ -103,4 +105,10 @@ public final class QuickChatUtils {
         }
         return component;
     }
+
+    //? if >=1.21.6 {
+    public static List<FormattedCharSequence> splitTooltipLines(Component component) {
+        return Minecraft.getInstance().font.split(component, 170);
+    }
+    //?}
 }
