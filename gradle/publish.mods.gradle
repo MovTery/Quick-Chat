@@ -52,25 +52,6 @@ def gameVersions = [
     "26.2-fabric"     : ["26.2", "26.3"],
     "26.2-neoforge"   : ["26.2", "26.3"],
 ]
-// 显示名中的兼容档范围（面向用户）
-def rangeDisplay = [
-    "1.20.1-fabric"   : "1.20.1",
-    "1.20.1-forge"    : "1.20.1",
-    "1.20.4-fabric"   : "1.20.4 / 1.20.6–1.21.5",
-    "1.20.4-neoforge" : "1.20.4",
-    "1.20.6-neoforge" : "1.20.6",
-    "1.21-neoforge"   : "1.21–1.21.5",
-    "1.21.6-fabric"   : "1.21.6–1.21.8",
-    "1.21.6-neoforge" : "1.21.6–1.21.8",
-    "1.21.9-fabric"   : "1.21.9–1.21.10",
-    "1.21.9-neoforge" : "1.21.9–1.21.10",
-    "1.21.11-fabric"  : "1.21.11",
-    "1.21.11-neoforge": "1.21.11",
-    "26.1-fabric"     : "26.1–26.1.2",
-    "26.1-neoforge"   : "26.1–26.1.2",
-    "26.2-fabric"     : "26.2–26.3",
-    "26.2-neoforge"   : "26.2–26.3",
-]
 
 def nodeName = project.name
 def versions = gameVersions[nodeName]
@@ -97,17 +78,12 @@ if (tasks.names.contains("remapJar")) {
     artifactFile = tasks.named("jar").flatMap { it.archiveFile }
 }
 
-// 注意：本脚本是动态 Groovy（无类型安全访问器），Property 一律显式 .set(...)——
-// `属性 = 值` 写法在动态闭包里会静默失效（本地变量遮蔽属性名时尤甚）
-def publishVersion = "${modVersion}+${mcBase}-${loader}"
-def publishDisplayName = "Quick Chat ${modVersion} — ${loaderDisplay} ${rangeDisplay[nodeName]}"
-
 publishMods {
     dryRun.set(publishDryRun)
     file.set(artifactFile)
     changelog.set(providers.fileContents(changelogRegularFile).asText)
-    version.set(publishVersion)
-    displayName.set(publishDisplayName)
+    version.set("${modVersion}+${mcBase}-${loader}")
+    displayName.set("Quick Chat ${modVersion}-${loaderDisplay}")
     type.set(STABLE) // STABLE/BETA/ALPHA 常量由 publishMods 扩展暴露
     modLoaders.add(loader)
 
