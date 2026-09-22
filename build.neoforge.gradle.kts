@@ -1,5 +1,6 @@
 plugins {
     id("net.neoforged.moddev") version "2.0.147"
+    id("me.modmuss50.mod-publish-plugin") version "2.2.1"
 }
 
 stonecutter {
@@ -100,3 +101,5 @@ tasks.processResources {
         expand(props)
     }
 }
+
+apply(from = rootProject.file("gradle/publish.mods.gradle"))

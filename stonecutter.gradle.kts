@@ -10,3 +10,9 @@ tasks.register("buildAll") {
     description = "Builds the mod for every registered version and loader."
     dependsOn(allBuilds, "stonecutterSaveModels")
 }
+
+tasks.register("publishAllMods") {
+    group = "publishing"
+    description = "Publishes every version node's build to Modrinth and CurseForge."
+    dependsOn(stonecutter.tasks.named("publishMods"))
+}

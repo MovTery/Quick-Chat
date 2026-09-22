@@ -1,0 +1,152 @@
+//   gradlew publishAllMods                         真实发布
+//   gradlew publishAllMods -Ppublish.dryRun=true   演练，不访问平台，产物写进各节点 build/publishMods
+//   注意：PowerShell 里 -P 参数必须整体加引号：" -Ppublish.dryRun=true"，否则点号会被拆开
+def envFile = rootProject.file(".publish.env")
+def env = [:]
+if (envFile.exists()) {
+    envFile.eachLine { line ->
+        def trimmed = line.trim()
+        if (trimmed && !trimmed.startsWith("#")) {
+            def idx = trimmed.indexOf('=')
+            if (idx > 0) {
+                env[trimmed.substring(0, idx).trim()] = trimmed.substring(idx + 1).trim().replaceAll(/^["']|["']$/, '')
+            }
+        }
+    }
+}
+def publishEnv = { String key -> System.getenv(key) ?: env[key] }
+
+def modrinthToken = publishEnv("MODRINTH_TOKEN")
+def curseforgeToken = publishEnv("CURSEFORGE_TOKEN")
+def modrinthProjectId = publishEnv("MODRINTH_PROJECT_ID")
+def curseforgeProjectId = publishEnv("CURSEFORGE_PROJECT_ID")
+
+def publishDryRun = providers.gradleProperty("publish.dryRun").map { it.toBoolean() }.getOrElse(false)
+def requiredKeys = ["MODRINTH_TOKEN", "MODRINTH_PROJECT_ID", "CURSEFORGE_TOKEN", "CURSEFORGE_PROJECT_ID"]
+def missing = requiredKeys.findAll { !publishEnv(it) }
+// 校验不在配置期抛错（否则 IDEA 同步/普通构建也会失败），延迟到发布任务执行期的 doFirst
+def missingMessage =
+        "Missing required publish token(s)/project ID(s): " + missing +
+                "\nPlease fill in MODRINTH_TOKEN / MODRINTH_PROJECT_ID / CURSEFORGE_TOKEN / CURSEFORGE_PROJECT_ID in .publish.env at the repository root" +
+                "\n(For a dry run first, add -Ppublish.dryRun=true; no platform will be accessed)"
+// dry-run 模式允许留空，用占位符保证配置阶段通过
+def tokenOrPlaceholder = { String v -> v ?: (publishDryRun ? "dry-run-placeholder" : v) }
+
+// —— 每个节点的平台元数据：与 versions/<节点>/gradle.properties 的 deps.minecraft.range 一一对应 ——
+// gameVersions = 该档 jar 可运行的游戏版本（未适配的版本不声明，如 1.20.2/1.20.3/1.20.5）
+def gameVersions = [
+    "1.20.1-fabric"   : ["1.20.1"],
+    "1.20.1-forge"    : ["1.20.1"],
+    "1.20.4-fabric"   : ["1.20.4", "1.20.6", "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5"],
+    "1.20.4-neoforge" : ["1.20.4"],
+    "1.20.6-neoforge" : ["1.20.6"],
+    "1.21-neoforge"   : ["1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5"],
+    "1.21.6-fabric"   : ["1.21.6", "1.21.7", "1.21.8"],
+    "1.21.6-neoforge" : ["1.21.6", "1.21.7", "1.21.8"],
+    "1.21.9-fabric"   : ["1.21.9", "1.21.10"],
+    "1.21.9-neoforge" : ["1.21.9", "1.21.10"],
+    "1.21.11-fabric"  : ["1.21.11"],
+    "1.21.11-neoforge": ["1.21.11"],
+    "26.1-fabric"     : ["26.1", "26.1.1", "26.1.2"],
+    "26.1-neoforge"   : ["26.1", "26.1.1", "26.1.2"],
+    "26.2-fabric"     : ["26.2", "26.3"],
+    "26.2-neoforge"   : ["26.2", "26.3"],
+]
+// 显示名中的兼容档范围（面向用户）
+def rangeDisplay = [
+    "1.20.1-fabric"   : "1.20.1",
+    "1.20.1-forge"    : "1.20.1",
+    "1.20.4-fabric"   : "1.20.4 / 1.20.6–1.21.5",
+    "1.20.4-neoforge" : "1.20.4",
+    "1.20.6-neoforge" : "1.20.6",
+    "1.21-neoforge"   : "1.21–1.21.5",
+    "1.21.6-fabric"   : "1.21.6–1.21.8",
+    "1.21.6-neoforge" : "1.21.6–1.21.8",
+    "1.21.9-fabric"   : "1.21.9–1.21.10",
+    "1.21.9-neoforge" : "1.21.9–1.21.10",
+    "1.21.11-fabric"  : "1.21.11",
+    "1.21.11-neoforge": "1.21.11",
+    "26.1-fabric"     : "26.1–26.1.2",
+    "26.1-neoforge"   : "26.1–26.1.2",
+    "26.2-fabric"     : "26.2–26.3",
+    "26.2-neoforge"   : "26.2–26.3",
+]
+
+def nodeName = project.name
+def versions = gameVersions[nodeName]
+if (versions == null) {
+    logger.warn("[publish] Node ${nodeName} is not in the publish metadata table, skipping publish configuration")
+    return
+}
+
+def loader = nodeName.endsWith("-fabric") ? "fabric" : nodeName.endsWith("-neoforge") ? "neoforge" : "forge"
+def loaderDisplay = [fabric: "Fabric", neoforge: "NeoForge", forge: "Forge"][loader]
+def mcBase = project.property("deps.minecraft")
+def modVersion = project.property("mod.version")
+
+def changelogRegularFile = rootProject.layout.projectDirectory.file("changelog/${modVersion}.md")
+def missingChangelogMessage =
+        "Missing changelog file: ${changelogRegularFile.asFile} (a changelog/<mod.version>.md must be provided for each release and is shared by all nodes)"
+
+// 发布产物：有 remapJar 的管线（fabric 经典 loom / fabric-remap）用 remapJar，
+// 无重映射管线（26.x fabric、NeoForge MDG）与 Forge（reobfJar 原地重写 jar）用 jar
+def artifactFile
+if (tasks.names.contains("remapJar")) {
+    artifactFile = tasks.named("remapJar").flatMap { it.archiveFile }
+} else {
+    artifactFile = tasks.named("jar").flatMap { it.archiveFile }
+}
+
+// 注意：本脚本是动态 Groovy（无类型安全访问器），Property 一律显式 .set(...)——
+// `属性 = 值` 写法在动态闭包里会静默失效（本地变量遮蔽属性名时尤甚）
+def publishVersion = "${modVersion}+${mcBase}-${loader}"
+def publishDisplayName = "Quick Chat ${modVersion} — ${loaderDisplay} ${rangeDisplay[nodeName]}"
+
+publishMods {
+    dryRun.set(publishDryRun)
+    file.set(artifactFile)
+    changelog.set(providers.fileContents(changelogRegularFile).asText)
+    version.set(publishVersion)
+    displayName.set(publishDisplayName)
+    type.set(STABLE) // STABLE/BETA/ALPHA 常量由 publishMods 扩展暴露
+    modLoaders.add(loader)
+
+    modrinth {
+        projectId.set(modrinthProjectId ?: "dry-run-placeholder")
+        accessToken.set(tokenOrPlaceholder(modrinthToken))
+        minecraftVersionList(versions.join(","))
+        if (loader == "fabric") {
+            requires("fabric-api")
+            optional("modmenu")
+        }
+    }
+    curseforge {
+        projectId.set(curseforgeProjectId ?: "0")
+        accessToken.set(tokenOrPlaceholder(curseforgeToken))
+        minecraftVersionList(versions.join(","))
+        client.set(true)
+        server.set(false)
+        javaVersions.add(JavaVersion.toVersion(project.property("deps.java")))
+        if (loader == "fabric") {
+            requires("fabric-api")
+            optional("modmenu")
+        }
+    }
+}
+
+// Forge 管线：reobfJar 是 jar 的 finalizer，发布任务必须显式等它完成，否则可能上传未重混淆的 jar
+if (tasks.names.contains("reobfJar")) {
+    tasks.named("publishMods") { dependsOn(tasks.named("reobfJar")) }
+}
+
+// 执行期校验：真正要发布（非 dry-run）时令牌/changelog 必须就绪
+tasks.matching { it.name in ["publishModrinth", "publishCurseforge"] }.configureEach {
+    doFirst {
+        if (!changelogRegularFile.asFile.exists()) {
+            throw new GradleException(missingChangelogMessage)
+        }
+        if (!publishDryRun && !missing.isEmpty()) {
+            throw new GradleException(missingMessage)
+        }
+    }
+}

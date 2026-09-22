@@ -1,5 +1,6 @@
 plugins {
     id("net.fabricmc.fabric-loom") version "1.18.2"
+    id("me.modmuss50.mod-publish-plugin") version "2.2.1"
 }
 
 stonecutter {
@@ -67,3 +68,5 @@ tasks.processResources {
         expand(props)
     }
 }
+
+apply(from = rootProject.file("gradle/publish.mods.gradle"))
