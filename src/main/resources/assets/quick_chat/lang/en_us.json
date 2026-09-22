@@ -4,7 +4,7 @@
   "modmenu.nameTranslation.quick_chat": "Quick Chat",
   "modmenu.descriptionTranslation.quick_chat": "Send messages quickly with a key press.",
 
-  "quick_chat.keybinding.one_click": "One-Click Send",
+  "quick_chat.keybinding.wheel": "Open Quick Message Wheel",
   "quick_chat.keybinding.config": "Open Config Screen",
   "quick_chat.keybinding.quick_message": "Open Quick Message List Screen",
 
@@ -49,5 +49,20 @@
   "quick_chat.gui.message_list.send": "Send",
   "quick_chat.gui.message_list.send_not_in_game": "Please enter the game before using this feature!",
   "quick_chat.gui.add_message.title": "Edit Quick Message",
-  "quick_chat.gui.add_message.add": "Confirm"
+  "quick_chat.gui.add_message.add": "Confirm",
+
+  "quick_chat.gui.wheel.title": "Quick Message Wheel",
+  "quick_chat.gui.wheel.open": "Edit Quick Message Wheel",
+  "quick_chat.gui.wheel.open.desc": "Set quick messages for the eight direction slots. Hold the wheel key in game, move the mouse to pick a direction, then release to send",
+  "quick_chat.gui.wheel.empty": "Empty",
+  "quick_chat.gui.wheel.edit_title": "Edit Wheel Message: %s",
+  "quick_chat.gui.wheel.click_to_edit": "Click to edit",
+  "quick_chat.gui.wheel.direction.up": "Up",
+  "quick_chat.gui.wheel.direction.up_right": "Up Right",
+  "quick_chat.gui.wheel.direction.right": "Right",
+  "quick_chat.gui.wheel.direction.down_right": "Down Right",
+  "quick_chat.gui.wheel.direction.down": "Down",
+  "quick_chat.gui.wheel.direction.down_left": "Down Left",
+  "quick_chat.gui.wheel.direction.left": "Left",
+  "quick_chat.gui.wheel.direction.up_left": "Up Left"
 }

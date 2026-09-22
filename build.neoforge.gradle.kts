@@ -23,6 +23,8 @@ fun Project.expandProps(): Map<String, String> = mapOf(
     "neoforge_version" to prop("deps.neoforge"),
     "neoforge_version_range" to prop("deps.neoforge.range"),
     "neoforge_loader_version_range" to prop("deps.neoforge.loader.range"),
+    //NeoForge 26.2 起废弃 logoFile
+    "mod_logo_property" to if (sc.current.parsed < "26.2") "logoFile" else "iconFile",
 )
 
 version = prop("mod.version")

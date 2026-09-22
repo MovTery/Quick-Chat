@@ -1,5 +1,5 @@
 //? if forge {
-package com.movtery.quick_chat.loader.forge;
+/*package com.movtery.quick_chat.loader.forge;
 
 import com.movtery.quick_chat.gui.ConfigScreen;
 import net.minecraftforge.client.ConfigScreenHandler;
@@ -11,4 +11,4 @@ public class RegisterModsPage {
                 () -> new ConfigScreenHandler.ConfigScreenFactory((minecraft, screen) -> new ConfigScreen(screen)));
     }
 }
-//?}
+*///?}

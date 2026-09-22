@@ -1,11 +1,11 @@
 //? if neoforge {
-package com.movtery.quick_chat.loader.neoforge;
+/*package com.movtery.quick_chat.loader.neoforge;
 
 import com.movtery.quick_chat.platform.services.IPlatformHelper;
 import net.neoforged.fml.ModList;
-//? if <1.21.11 {
-import net.neoforged.fml.loading.FMLLoader;
-//?} else {
+//? if <1.21.9 {
+/^import net.neoforged.fml.loading.FMLLoader;
+^///?} else {
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
 //?}
@@ -24,8 +24,8 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
         return ModList.get().isLoaded(modId);
     }
 
-    //? if <1.21.11 {
-    @Override
+    //? if <1.21.9 {
+    /^@Override
     public boolean isDevelopmentEnvironment() {
         return !FMLLoader.isProduction();
     }
@@ -34,7 +34,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     public Path getConfigurationDirectory() {
         return FMLLoader.getGamePath().resolve("config");
     }
-    //?} else {
+    ^///?} else {
     @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLEnvironment.isProduction();
@@ -46,4 +46,4 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     }
     //?}
 }
-//?}
+*///?}

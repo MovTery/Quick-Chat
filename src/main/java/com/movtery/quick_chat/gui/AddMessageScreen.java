@@ -6,14 +6,15 @@ import com.movtery.quick_chat.core.Message;
 import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.client.Minecraft;
 //? if <26.1 {
-import net.minecraft.client.gui.GuiGraphics;
-//?} else {
+/*import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.FormattedCharSequence;
+*///?} else {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 //?}
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.components.EditBox;
-//? if >=1.21.11 {
+//? if >=1.21.9 {
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 //?}
@@ -22,9 +23,11 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public class AddMessageScreen extends Screen {
     private final Screen parent;
@@ -32,17 +35,22 @@ public class AddMessageScreen extends Screen {
     private EditBox messageField;
     private EditBox commentField;
     private CommandSuggestions commandSuggestions;
+    @Nullable
+    private final BiConsumer<String, String> onSave;
 
     public AddMessageScreen(Screen parent) {
-        super(Component.translatable("quick_chat.gui.add_message.title"));
-        this.parent = parent;
-        this.messageObject = null;
+        this(parent, null, null, null);
     }
 
     public AddMessageScreen(Screen parent, Message messageObject) {
-        super(Component.translatable("quick_chat.gui.add_message.title"));
+        this(parent, messageObject, null, null);
+    }
+
+    public AddMessageScreen(Screen parent, @Nullable Message messageObject, @Nullable BiConsumer<String, String> onSave, @Nullable Component titleOverride) {
+        super(titleOverride != null ? titleOverride : Component.translatable("quick_chat.gui.add_message.title"));
         this.parent = parent;
         this.messageObject = messageObject;
+        this.onSave = onSave;
     }
 
     @Override
@@ -88,23 +96,32 @@ public class AddMessageScreen extends Screen {
     }
 
     //? if <26.1 {
-    @Override
+    /*@Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         //? if <1.20.2 {
-        this.renderBackground(guiGraphics);
-        //?}
+        /^this.renderBackground(guiGraphics);
+        ^///?}
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.messageField.render(guiGraphics, mouseX, mouseY, delta);
 
-        guiGraphics.drawWordWrap(this.font, Component.translatable("quick_chat.config.comment"), this.width / 2 - 150, this.height - 110, 500, 0xFFFFFFFF);
+        drawWordWrap(guiGraphics, this.width / 2 - 150, this.height - 110, 500, Component.translatable("quick_chat.config.comment"));
         this.commentField.render(guiGraphics, mouseX, mouseY, delta);
 
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
-        guiGraphics.drawWordWrap(this.font, Component.translatable("quick_chat.config.message.desc"), this.width / 2 - 150, this.height - 70, 500, 0xFFFFFFFF);
+        drawWordWrap(guiGraphics, this.width / 2 - 150, this.height - 70, 500, Component.translatable("quick_chat.config.message.desc"));
 
         this.commandSuggestions.render(guiGraphics, mouseX, mouseY);
     }
-    //?} else {
+
+    //GuiGraphics.drawWordWrap 的 6 参重载在 1.21.4 更换了 intermediary 名称，直接调用会使
+    //1.20.4 兼容档的 jar 在 1.21.4+ 上抛 NoSuchMethodError，改用 Font.split + drawString 手动折行
+    private void drawWordWrap(@NotNull GuiGraphics guiGraphics, int x, int y, int width, @NotNull Component text) {
+        for (FormattedCharSequence line : this.font.split(text, width)) {
+            guiGraphics.drawString(this.font, line, x, y, 0xFFFFFFFF);
+            y += 9;
+        }
+    }
+    *///?} else {
     @Override
     public void extractRenderState(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
@@ -121,7 +138,7 @@ public class AddMessageScreen extends Screen {
     //?}
 
     //? if <1.21.11 {
-    @Override
+    /*@Override
     public void resize(@NotNull Minecraft minecraft, int width, int height) {
         String message = this.messageField.getValue();
         String comment = this.commentField.getValue();
@@ -130,7 +147,7 @@ public class AddMessageScreen extends Screen {
         this.commentField.setValue(comment);
         updateCommandInfo();
     }
-    //?} else {
+    *///?} else {
     @Override
     public void resize(int width, int height) {
         String message = this.messageField.getValue();
@@ -142,8 +159,8 @@ public class AddMessageScreen extends Screen {
     }
     //?}
 
-    //? if <1.21.11 {
-    @Override
+    //? if <1.21.9 {
+    /*@Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (this.commandSuggestions.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
@@ -156,7 +173,7 @@ public class AddMessageScreen extends Screen {
             return true;
         }
     }
-    //?} else {
+    *///?} else {
     @Override
     public boolean keyPressed(KeyEvent event) {
         if (this.commandSuggestions.keyPressed(event)) {
@@ -173,23 +190,23 @@ public class AddMessageScreen extends Screen {
     //?}
 
     //? if <1.20.2 {
-    @Override
+    /*@Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
         return this.commandSuggestions.mouseScrolled(delta) || super.mouseScrolled(mouseX, mouseY, delta);
     }
-    //?} else {
+    *///?} else {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double xAmount, double yAmount) {
         return this.commandSuggestions.mouseScrolled(yAmount) || super.mouseScrolled(mouseX, mouseY, xAmount, yAmount);
     }
     //?}
 
-    //? if <1.21.11 {
-    @Override
+    //? if <1.21.9 {
+    /*@Override
     public boolean mouseClicked(double d, double e, int i) {
         return this.commandSuggestions.mouseClicked(d, e, i) || super.mouseClicked(d, e, i);
     }
-    //?} else {
+    *///?} else {
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubled) {
         return this.commandSuggestions.mouseClicked(event) || super.mouseClicked(event, doubled);
@@ -205,6 +222,13 @@ public class AddMessageScreen extends Screen {
     private void addMessage() {
         String message = this.messageField.getValue();
         String comment = this.commentField.getValue();
+
+        if (this.onSave != null) {
+            this.onSave.accept(message, comment);
+            this.onClose();
+            return;
+        }
+
         Config config = Constants.getConfig();
         ArrayList<Message> messageWithComment = config.getOptions().messageWithComment;
         if (!message.isEmpty()) {

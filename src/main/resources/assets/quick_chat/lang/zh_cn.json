@@ -4,7 +4,7 @@
   "modmenu.nameTranslation.quick_chat": "快捷聊天",
   "modmenu.descriptionTranslation.quick_chat": "通过按键快速发送消息。",
 
-  "quick_chat.keybinding.one_click": "一键发送",
+  "quick_chat.keybinding.wheel": "打开快捷消息轮盘",
   "quick_chat.keybinding.config": "打开配置屏幕",
   "quick_chat.keybinding.quick_message": "打开快捷消息列表屏幕",
 
@@ -49,5 +49,20 @@
   "quick_chat.gui.message_list.send": "发送",
   "quick_chat.gui.message_list.send_not_in_game": "请进入游戏后再使用此功能!",
   "quick_chat.gui.add_message.title": "编辑快捷消息",
-  "quick_chat.gui.add_message.add": "确定"
+  "quick_chat.gui.add_message.add": "确定",
+
+  "quick_chat.gui.wheel.title": "快捷消息轮盘",
+  "quick_chat.gui.wheel.open": "编辑快捷消息轮盘",
+  "quick_chat.gui.wheel.open.desc": "设置八个方向槽位的快捷消息；在游戏中按住轮盘键打开轮盘，移动鼠标选择方向后松开按键即可发送",
+  "quick_chat.gui.wheel.empty": "空",
+  "quick_chat.gui.wheel.edit_title": "编辑轮盘消息：%s",
+  "quick_chat.gui.wheel.click_to_edit": "点击进行编辑",
+  "quick_chat.gui.wheel.direction.up": "上",
+  "quick_chat.gui.wheel.direction.up_right": "右上",
+  "quick_chat.gui.wheel.direction.right": "右",
+  "quick_chat.gui.wheel.direction.down_right": "右下",
+  "quick_chat.gui.wheel.direction.down": "下",
+  "quick_chat.gui.wheel.direction.down_left": "左下",
+  "quick_chat.gui.wheel.direction.left": "左",
+  "quick_chat.gui.wheel.direction.up_left": "左上"
 }

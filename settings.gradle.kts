@@ -18,7 +18,7 @@ stonecutter {
     create(rootProject) {
         // 每个节点代表一个代码兼容档；节点覆盖的版本区间记录在
         // versions/<节点>/gradle.properties 的 deps.minecraft.range（fabric 另有 dep）中。
-        // 1.20.2/1.20.3、1.20.5、1.21.6 ~ 1.21.10（1.21.9 输入系统重构）未适配，不在支持范围内。
+        // 1.20.2/1.20.3、1.20.5 未适配，不在支持范围内。
 
         version("1.20.1-fabric", "1.20.1").buildscript = "build.fabric.gradle.kts"
         version("1.20.1-forge", "1.20.1").buildscript = "build.forge.gradle.kts"
@@ -31,6 +31,14 @@ stonecutter {
 
         // [1.21, 1.21.6)：1.21 ~ 1.21.5 同代码档
         version("1.21-neoforge", "1.21").buildscript = "build.neoforge.gradle.kts"
+
+        // [1.21.6, 1.21.9)：1.21.6 ~ 1.21.8 同代码档（1.21.6 GUI 渲染管线重构）
+        version("1.21.6-fabric", "1.21.6").buildscript = "build.fabric-remap.gradle.kts"
+        version("1.21.6-neoforge", "1.21.6").buildscript = "build.neoforge.gradle.kts"
+
+        // [1.21.9, 1.21.11)：1.21.9 ~ 1.21.10 同代码档（1.21.9 输入系统重构）
+        version("1.21.9-fabric", "1.21.9").buildscript = "build.fabric-remap.gradle.kts"
+        version("1.21.9-neoforge", "1.21.9").buildscript = "build.neoforge.gradle.kts"
 
         version("1.21.11-fabric", "1.21.11").buildscript = "build.fabric-remap.gradle.kts"
         version("1.21.11-neoforge", "1.21.11").buildscript = "build.neoforge.gradle.kts"

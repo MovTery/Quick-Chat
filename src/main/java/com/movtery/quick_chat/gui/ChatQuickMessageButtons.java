@@ -8,7 +8,7 @@ import com.movtery.quick_chat.util.QuickChatUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.EditBox;
-//? if >=1.21.11 {
+//? if >=1.21.9 {
 import net.minecraft.client.gui.components.ChatComponent;
 //?}
 import net.minecraft.network.chat.Component;
@@ -30,10 +30,10 @@ public class ChatQuickMessageButtons {
     public ArrayList<TransparentButton> getAllButton(@NotNull ButtonClickListener listener) {
         ArrayList<TransparentButton> buttons = new ArrayList<>();
         if (this.options.chatQuickMessageButton) {
-            //? if <1.21.11 {
-            int chatWidth = this.minecraft.gui.getChat().getWidth();
+            //? if <1.21.9 {
+            /*int chatWidth = this.minecraft.gui.getChat().getWidth();
             int chatHeight = this.minecraft.gui.getChat().getHeight();
-            //?} else {
+            *///?} else {
             int chatWidth = ChatComponent.getWidth(this.minecraft.options.chatWidth().get());
             int chatHeight = ChatComponent.getHeight(this.minecraft.options.chatHeightFocused().get());
             //?}

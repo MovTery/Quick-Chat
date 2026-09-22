@@ -1,17 +1,17 @@
 package com.movtery.quick_chat.gui.widget;
 
 //? if <1.21.5 {
-import com.mojang.blaze3d.systems.RenderSystem;
-//?}
+/*import com.mojang.blaze3d.systems.RenderSystem;
+*///?}
 //? if <1.21.11 {
-import net.minecraft.Util;
-//?} else {
+/*import net.minecraft.Util;
+*///?} else {
 import net.minecraft.util.Util;
 //?}
 import net.minecraft.client.Minecraft;
 //? if <26.1 {
-import net.minecraft.client.gui.GuiGraphics;
-//?} else {
+/*import net.minecraft.client.gui.GuiGraphics;
+*///?} else {
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 //?}
 import net.minecraft.client.gui.components.Button;
@@ -29,17 +29,17 @@ public class TransparentButton extends Button {
     }
 
     //? if <1.21.11 {
-    @Override
+    /*@Override
     protected void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         drawContents(guiGraphics, mouseX, mouseY, delta);
     }
-    //?}
+    *///?}
     //? if 1.21.11 {
-    @Override
+    /*@Override
     protected void renderContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         drawContents(guiGraphics, mouseX, mouseY, delta);
     }
-    //?}
+    *///?}
     //? if >=26.1 {
     @Override
     protected void extractContents(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
@@ -48,13 +48,13 @@ public class TransparentButton extends Button {
     //?}
 
     //? if <26.1 {
-    private void drawContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    /*private void drawContents(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         Minecraft minecraft = Minecraft.getInstance();
 
         //? if <1.21.5 {
-        RenderSystem.enableBlend();
+        /^RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        //?}
+        ^///?}
 
         int color;
         int alpha = (int) (minecraft.options.textBackgroundOpacity().get() * 255);
@@ -67,7 +67,7 @@ public class TransparentButton extends Button {
         int textY = this.getY() + (this.getHeight() - minecraft.font.lineHeight) / 2 + 1; //自适应纵向居中 (+1 为视觉偏移)
         guiGraphics.drawString(minecraft.font, this.getMessage(), this.getX() + 4, textY, textColor);
     }
-    //?} else {
+    *///?} else {
     private void drawContents(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         Minecraft minecraft = Minecraft.getInstance();
 

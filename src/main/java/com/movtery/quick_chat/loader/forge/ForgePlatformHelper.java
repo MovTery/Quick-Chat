@@ -1,5 +1,5 @@
 //? if forge {
-package com.movtery.quick_chat.loader.forge;
+/*package com.movtery.quick_chat.loader.forge;
 
 import com.movtery.quick_chat.platform.services.IPlatformHelper;
 import net.minecraftforge.fml.ModList;
@@ -29,4 +29,4 @@ public class ForgePlatformHelper implements IPlatformHelper {
         return FMLLoader.getGamePath().resolve("config");
     }
 }
-//?}
+*///?}

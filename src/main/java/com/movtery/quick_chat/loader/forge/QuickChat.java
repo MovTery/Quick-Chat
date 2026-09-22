@@ -1,5 +1,5 @@
 //? if forge {
-package com.movtery.quick_chat.loader.forge;
+/*package com.movtery.quick_chat.loader.forge;
 
 import com.movtery.quick_chat.CommonClass;
 import com.movtery.quick_chat.Constants;
@@ -39,10 +39,10 @@ public final class QuickChat {
 
         @SubscribeEvent
         public static void registerBindings(RegisterKeyMappingsEvent event) {
-            event.register(KeybindActions.ONE_CLICK);
+            event.register(KeybindActions.WHEEL);
             event.register(KeybindActions.QUICK_MESSAGE);
             event.register(KeybindActions.CONFIG);
         }
     }
 }
-//?}
+*///?}

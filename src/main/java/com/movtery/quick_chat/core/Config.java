@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 
 public class Config {
@@ -34,12 +35,19 @@ public class Config {
             try {
                 options = GSON.fromJson(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8), Options.class);
                 if (options != null) {
-                    if (options.messageValue != null) {
-                        String messageValue = options.messageValue;
-                        if (messageValue.length() > 256) {
-                            options.messageValue = messageValue.substring(0, 256);
+                    for (WheelDirection direction : WheelDirection.values()) {
+                        Message message = options.wheelMessages.get(direction);
+                        if (message == null || message.getMessage() == null) {
+                            options.wheelMessages.put(direction, new Message("", ""));
+                            continue;
                         }
-                    } else options.messageValue = "Hello!";
+                        if (message.getMessage().length() > 256) {
+                            message.setMessage(message.getMessage().substring(0, 256));
+                        }
+                        if (message.getComment() == null) {
+                            message.setComment("");
+                        }
+                    }
 
                     if (!options.message.isEmpty()) {
                         for (String item : options.message) {
@@ -92,7 +100,7 @@ public class Config {
     }
 
     public static class Options {
-        @Expose public String messageValue = "Hello!";
+        @Expose public EnumMap<WheelDirection, Message> wheelMessages = createEmptyWheelMessages();
         @Expose public boolean antiFalseContact = false;
         @Expose public boolean chatQuickMessageButton = true;
         @Expose public int chatQuickMessageButtonWidth = 80;
@@ -107,7 +115,15 @@ public class Config {
 
         @Expose public ArrayList<Message> messageWithComment = new ArrayList<>();
 
-        public int getChatButtonWidth() {
+        public static EnumMap<WheelDirection, Message> createEmptyWheelMessages() {
+        EnumMap<WheelDirection, Message> map = new EnumMap<>(WheelDirection.class);
+        for (WheelDirection direction : WheelDirection.values()) {
+            map.put(direction, new Message("", ""));
+        }
+        return map;
+    }
+
+    public int getChatButtonWidth() {
             int[] widthRange = {60, 200};
             return this.chatQuickMessageButtonWidth > widthRange[1] ? widthRange[1] : Math.max(this.chatQuickMessageButtonWidth, widthRange[0]);
         }
