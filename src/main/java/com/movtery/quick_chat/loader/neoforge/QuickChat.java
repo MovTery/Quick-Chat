@@ -61,6 +61,9 @@ public class QuickChat {
 
         @SubscribeEvent
         public static void registerBindings(RegisterKeyMappingsEvent event) {
+            //? if >=1.21.9 {
+            /^event.registerCategory(KeybindActions.CATEGORY);
+            ^///?}
             event.register(KeybindActions.WHEEL);
             event.register(KeybindActions.QUICK_MESSAGE);
             event.register(KeybindActions.CONFIG);

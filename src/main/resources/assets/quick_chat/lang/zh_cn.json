@@ -1,5 +1,6 @@
 {
   "quick_chat.name": "快捷聊天",
+  "key.category.quick_chat.main": "快捷聊天",
 
   "modmenu.nameTranslation.quick_chat": "快捷聊天",
   "modmenu.descriptionTranslation.quick_chat": "通过按键快速发送消息。",

@@ -11,6 +11,11 @@ import net.minecraft.client.Minecraft;
 *///?} else {
 import com.mojang.blaze3d.platform.InputConstants;
 //?}
+//? if >=1.21.11 {
+import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;
+*///?}
 
 /**
  * 三个全局快捷键的定义与按下行为，由各加载器注册并接入 tick 事件
@@ -26,6 +31,34 @@ public final class KeybindActions {
     private static final int KEY_CONFIG = InputConstants.KEY_J;
     //?}
 
+    //? if <1.21.9 {
+    /*public static final KeyMapping WHEEL = key("quick_chat.keybinding.wheel", KEY_WHEEL);
+    public static final KeyMapping QUICK_MESSAGE = key("quick_chat.keybinding.quick_message", KEY_QUICK_MESSAGE);
+    public static final KeyMapping CONFIG = key("quick_chat.keybinding.config", KEY_CONFIG);
+
+    private KeybindActions() {
+    }
+
+    private static KeyMapping key(String name, int defaultKey) {
+        return new KeyMapping(name, defaultKey, "quick_chat.name");
+    }
+    *///?} else {
+    //? if fabric {
+    public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(categoryId());
+    //?} else {
+    /*public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(categoryId());
+    *///?}
+
+    //? if <1.21.11 {
+    /*private static ResourceLocation categoryId() {
+        return ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "main");
+    }
+    *///?} else {
+    private static Identifier categoryId() {
+        return Identifier.fromNamespaceAndPath(Constants.MOD_ID, "main");
+    }
+    //?}
+
     public static final KeyMapping WHEEL = key("quick_chat.keybinding.wheel", KEY_WHEEL);
     public static final KeyMapping QUICK_MESSAGE = key("quick_chat.keybinding.quick_message", KEY_QUICK_MESSAGE);
     public static final KeyMapping CONFIG = key("quick_chat.keybinding.config", KEY_CONFIG);
@@ -33,13 +66,8 @@ public final class KeybindActions {
     private KeybindActions() {
     }
 
-    //? if <1.21.9 {
-    /*private static KeyMapping key(String name, int defaultKey) {
-        return new KeyMapping(name, defaultKey, "quick_chat.name");
-    }
-    *///?} else {
     private static KeyMapping key(String name, int defaultKey) {
-        return new KeyMapping(name, defaultKey, KeyMapping.Category.MISC);
+        return new KeyMapping(name, defaultKey, CATEGORY);
     }
     //?}
 

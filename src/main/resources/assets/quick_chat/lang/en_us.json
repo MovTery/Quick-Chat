@@ -1,5 +1,6 @@
 {
   "quick_chat.name": "Quick Chat",
+  "key.category.quick_chat.main": "Quick Chat",
 
   "modmenu.nameTranslation.quick_chat": "Quick Chat",
   "modmenu.descriptionTranslation.quick_chat": "Send messages quickly with a key press.",

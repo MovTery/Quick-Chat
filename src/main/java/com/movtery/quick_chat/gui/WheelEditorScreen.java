@@ -85,13 +85,23 @@ public class WheelEditorScreen extends Screen {
         return super.mouseClicked(mouseX, mouseY, button);
     }
     *///?} else {
-    @Override
+    //? if <26.3 {
+    /*@Override
     public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean doubled) {
         if (event.button() == 0 && openEditor(event.x(), event.y())) {
             return true;
         }
         return super.mouseClicked(event, doubled);
     }
+    *///?} else {
+    @Override
+    public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean doubled) {
+        if (event.button() == 1 && openEditor(event.x(), event.y())) {
+            return true;
+        }
+        return super.mouseClicked(event, doubled);
+    }
+    //?}
     //?}
 
     private boolean openEditor(double mouseX, double mouseY) {
